@@ -55,6 +55,18 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
         return $doctrineArticle->toDomain();
     }
 
+    public function delete(ArticleId $id): void
+    {
+        $doctrineArticle = $this->repository->find($id->getValue());
+
+        if ($doctrineArticle === null) {
+            throw ArticleNotFoundException::withId($id->getValue());
+        }
+
+        $this->entityManager->remove($doctrineArticle);
+        $this->entityManager->flush();
+    }
+
     /*
      * Queries
      */

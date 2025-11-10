@@ -15,7 +15,9 @@ interface IArticleRepository
     public function create(ArticleEntity $article): ArticleEntity;
 
     public function update(ArticleEntity $article): ArticleEntity;
-    
+
+    public function delete(ArticleId $id): void;
+
     /*
      * Queries
      */

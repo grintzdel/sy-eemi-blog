@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Article\Application\Services;
 
+use App\Modules\Article\Application\Commands\CreateArticleCommand;
 use App\Modules\Article\Application\Commands\UpdateArticleCommand;
 use App\Modules\Article\Application\UseCases\Commands\CreateArticleUseCase;
+use App\Modules\Article\Application\UseCases\Commands\DeleteArticleUseCase;
 use App\Modules\Article\Application\UseCases\Commands\UpdateArticleUseCase;
 use App\Modules\Article\Application\UseCases\Queries\FindAllArticlesUseCase;
 use App\Modules\Article\Application\UseCases\Queries\FindArticleByIdUseCase;
@@ -18,12 +20,13 @@ final readonly class ArticleService
         private FindArticleByIdUseCase $findArticleByIdUseCase,
         private FindAllArticlesUseCase $findAllArticlesUseCase,
         private UpdateArticleUseCase   $updateArticleUseCase,
+        private DeleteArticleUseCase   $deleteArticleUseCase,
     ) {}
 
     /*
      * Commands
      */
-    public function create(ArticleEntity $article): ArticleEntity
+    public function create(CreateArticleCommand $article): ArticleEntity
     {
         return $this->createArticleUseCase->execute($article);
     }
@@ -31,6 +34,11 @@ final readonly class ArticleService
     public function update(UpdateArticleCommand $article): ArticleEntity
     {
         return $this->updateArticleUseCase->execute($article);
+    }
+
+    public function delete(string $id): void
+    {
+        $this->deleteArticleUseCase->execute($id);
     }
 
     /*
