@@ -6,18 +6,14 @@ namespace App\Modules\User\Domain\ValueObjects;
 
 use Webmozart\Assert\Assert;
 
-final readonly class Username implements \Stringable
+final readonly class Email implements \Stringable
 {
-    private const int MIN = 3;
-
-    private const int MAX = 20;
-
     public string $value;
 
     public function __construct(string $value)
     {
         Assert::notEmpty($value);
-        Assert::lengthBetween($value, self::MIN, self::MAX);
+        Assert::email($value);
 
         $this->value = $value;
     }
@@ -26,5 +22,10 @@ final readonly class Username implements \Stringable
     public function __toString(): string
     {
         return $this->value;
+    }
+
+    public function equals(self $other): bool
+    {
+        return $this->value === $other->value;
     }
 }
