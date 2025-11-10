@@ -10,12 +10,18 @@ use App\Modules\Article\Domain\Repositories\IArticleRepository;
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
 use App\Modules\Article\Infrastructure\Doctrine\Entities\DoctrineArticleEntity;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 
 final readonly class DoctrineArticleRepository implements IArticleRepository
 {
+    private EntityRepository $repository;
+
     public function __construct(
         private EntityManagerInterface $entityManager
-    ) {}
+    )
+    {
+        $this->repository = $entityManager->getRepository(DoctrineArticleEntity::class);
+    }
 
     /*
      * Commands
@@ -35,10 +41,10 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
      */
     public function findById(ArticleId $id): ArticleEntity
     {
-        $repository = $this->entityManager->getRepository(DoctrineArticleEntity::class);
-        $doctrineArticle = $repository->find($id->getValue());
+        $doctrineArticle = $this->repository->find($id->getValue());
 
-        if ($doctrineArticle === null) {
+        if($doctrineArticle === null)
+        {
             throw ArticleNotFoundException::withId($id->getValue());
         }
 
@@ -47,8 +53,7 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
 
     public function findAll(): array
     {
-        $repository = $this->entityManager->getRepository(DoctrineArticleEntity::class);
-        $doctrineArticles = $repository->findAll();
+        $doctrineArticles = $this->repository->findAll();
 
         return array_map(
             fn(DoctrineArticleEntity $doctrineArticle) => $doctrineArticle->toDomain(),
