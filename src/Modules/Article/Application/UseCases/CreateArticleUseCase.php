@@ -11,7 +11,7 @@ use App\Modules\Article\Domain\Repositories\IArticleRepository;
 final readonly class CreateArticleUseCase
 {
     public function __construct(
-        private readonly IArticleRepository $repository
+        private IArticleRepository $repository
     ) {}
 
     public function execute(ArticleEntity $article): ArticleEntity
