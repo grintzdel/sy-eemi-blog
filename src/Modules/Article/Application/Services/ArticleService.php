@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Article\Application\Services;
 
-use App\Modules\Article\Application\UseCases\CreateArticleUseCase;
+use App\Modules\Article\Application\UseCases\Commands\CreateArticleUseCase;
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 
 final readonly class ArticleService

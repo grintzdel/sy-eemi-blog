@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Article\Application\UseCases;
+namespace App\Modules\Article\Application\UseCases\Commands;
 
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 use App\Modules\Article\Domain\Exceptions\ArticleDomainException;
