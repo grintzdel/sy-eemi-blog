@@ -16,20 +16,16 @@ final class UserModel
             minMessage: 'Username must be at least {{ limit }} characters long',
             maxMessage: 'Username cannot be longer than {{ limit }} characters'
         )]
-        public ?string $username = null,
+        public ?string             $username = null,
 
         #[Assert\NotBlank(message: 'Email is required')]
         #[Assert\Email(message: 'The email "{{ value }}" is not a valid email')]
-        public ?string $email = null,
+        public ?string             $email = null,
 
-        #[Assert\NotBlank(message: 'Age is required')]
-        #[Assert\Positive(message: 'Age must be a positive number')]
-        #[Assert\Range(
-            notInRangeMessage: 'Age must be between {{ min }} and {{ max }}',
-            min: 1,
-            max: 150
-        )]
-        public ?int    $age = null,
+        #[Assert\NotBlank(message: 'Birthdate is required')]
+        #[Assert\Type(\DateTimeInterface::class, message: 'Birthdate must be a valid date')]
+        #[Assert\LessThan('today', message: 'Birthdate must be in the past')]
+        public ?\DateTimeImmutable $birthdate = null,
     ) {}
 
 }

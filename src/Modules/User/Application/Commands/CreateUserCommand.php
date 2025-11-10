@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modules\User\Application\Commands;
 
-use App\Modules\User\Domain\ValueObjects\Age;
 use App\Modules\User\Domain\ValueObjects\Email;
 use App\Modules\User\Domain\ValueObjects\UserId;
 use App\Modules\User\Domain\ValueObjects\Username;
@@ -12,10 +11,10 @@ use App\Modules\User\Domain\ValueObjects\Username;
 final readonly class CreateUserCommand
 {
     public function __construct(
-        private UserId   $id,
-        private Username $username,
-        private Email    $email,
-        private Age      $age,
+        private UserId             $id,
+        private Username           $username,
+        private Email              $email,
+        private \DateTimeImmutable $birthdate,
     ) {}
 
     public function getId(): UserId
@@ -33,8 +32,8 @@ final readonly class CreateUserCommand
         return $this->email;
     }
 
-    public function getAge(): Age
+    public function getBirthdate(): \DateTimeImmutable
     {
-        return $this->age;
+        return $this->birthdate;
     }
 }

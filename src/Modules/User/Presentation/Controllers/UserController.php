@@ -9,7 +9,6 @@ use App\Modules\User\Application\Commands\CreateUserCommand;
 use App\Modules\User\Application\Services\UserService;
 use App\Modules\User\Domain\Exceptions\UserDomainException;
 use App\Modules\User\Domain\Exceptions\UserNotFoundException;
-use App\Modules\User\Domain\ValueObjects\Age;
 use App\Modules\User\Domain\ValueObjects\Email;
 use App\Modules\User\Domain\ValueObjects\UserId;
 use App\Modules\User\Domain\ValueObjects\Username;
@@ -62,7 +61,7 @@ final class UserController extends AppController
                     id: UserId::fromString(Uuid::v4()->toString()),
                     username: new Username($model->username),
                     email: new Email($model->email),
-                    age: Age::from($model->age),
+                    birthdate: $model->birthdate,
                 );
 
                 $this->userService->create($command);
