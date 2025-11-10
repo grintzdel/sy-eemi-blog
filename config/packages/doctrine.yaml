@@ -11,21 +11,21 @@ doctrine:
         auto_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         mappings:
-            App\Modules\Article:
-                type: xml
-                dir: '%kernel.project_dir%/config/doctrine/Article'
-                prefix: 'App\Modules\Domain\Model'
+            Article:
+                type: attribute
+                dir: '%kernel.project_dir%/src/Modules/Article/Infrastructure/Doctrine/Entities'
+                prefix: 'App\Modules\Article\Infrastructure\Doctrine\Entities'
                 is_bundle: false
-                #   App\Modules\Comment:
-                #    type: xml
-                #    dir: '%kernel.project_dir%/config/doctrine/Comment'
-                #    prefix: 'App\Modules\Comment\Domain\Model'
-                #    is_bundle: false
-                # App\Modules\User:
-                #     type: xml
-                #    dir: '%kernel.project_dir%/config/doctrine/User'
-                #    prefix: 'App\Modules\User\Domain\Model'
-                #   is_bundle: false
+            # Comment:
+            #     type: attribute
+            #     dir: '%kernel.project_dir%/src/Modules/Comment/Infrastructure/Doctrine/Entities'
+            #     prefix: 'App\Modules\Comment\Infrastructure\Doctrine\Entities'
+            #     is_bundle: false
+            # User:
+            #     type: attribute
+            #     dir: '%kernel.project_dir%/src/Modules/User/Infrastructure/Doctrine/Entities'
+            #     prefix: 'App\Modules\User\Infrastructure\Doctrine\Entities'
+            #     is_bundle: false
 
 when@test:
     doctrine:
