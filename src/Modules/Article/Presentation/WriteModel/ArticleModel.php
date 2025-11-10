@@ -7,7 +7,7 @@ namespace App\Modules\Article\Presentation\WriteModel;
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class ArticleModel
+final class ArticleModel
 {
     public function __construct(
         #[Assert\NotBlank(message: 'Heading is required')]
