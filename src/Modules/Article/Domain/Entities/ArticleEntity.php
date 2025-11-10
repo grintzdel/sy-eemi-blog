@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Modules\Article\Domain\Entities;
 
+use App\Modules\Article\Domain\ValueObjects\ArticleId;
+
 final readonly class ArticleEntity
 {
     public function __construct(
-        private string $id,
+        private ArticleId $id,
         private string $heading,
         private string $subheading,
         private string $content,
         private string $author,
     ) {}
 
-    public function getId(): string
+    public function getId(): ArticleId
     {
         return $this->id;
     }

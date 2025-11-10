@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Article\Infrastructure\Doctrine\Entities;
 
 use App\Modules\Article\Domain\Entities\ArticleEntity;
+use App\Modules\Article\Domain\ValueObjects\ArticleId;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -45,7 +46,7 @@ class DoctrineArticleEntity
     public static function fromDomain(ArticleEntity $article): self
     {
         return new self(
-            $article->getId(),
+            $article->getId()->getValue(),
             $article->getHeading(),
             $article->getSubheading(),
             $article->getContent(),
@@ -81,7 +82,7 @@ class DoctrineArticleEntity
     public function toDomain(): ArticleEntity
     {
         return new ArticleEntity(
-            $this->id,
+            ArticleId::fromString($this->id),
             $this->heading,
             $this->subheading,
             $this->content,
