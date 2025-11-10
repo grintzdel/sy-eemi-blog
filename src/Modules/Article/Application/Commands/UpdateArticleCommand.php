@@ -9,11 +9,12 @@ use App\Modules\Article\Domain\ValueObjects\ArticleId;
 final readonly class UpdateArticleCommand
 {
     public function __construct(
-        private ArticleId $id,
-        private ?string   $heading = null,
-        private ?string   $subheading = null,
-        private ?string   $content = null,
-        private ?string   $author = null,
+        private ArticleId           $id,
+        private ?string             $heading = null,
+        private ?string             $subheading = null,
+        private ?string             $content = null,
+        private ?string             $author = null,
+        private ?\DateTimeImmutable $updatedAt = null,
     ) {}
 
     public function getId(): ArticleId
@@ -39,5 +40,10 @@ final readonly class UpdateArticleCommand
     public function getAuthor(): ?string
     {
         return $this->author;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt ?? new \DateTimeImmutable();
     }
 }

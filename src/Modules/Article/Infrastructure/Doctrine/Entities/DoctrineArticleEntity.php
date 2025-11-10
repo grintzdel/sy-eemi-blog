@@ -55,12 +55,24 @@ class DoctrineArticleEntity
     )]
     private string $author;
 
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $updatedAt;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
+
     public function __construct(
-        string $id,
-        string $heading,
-        string $subheading,
-        string $content,
-        string $author
+        string              $id,
+        string              $heading,
+        string              $subheading,
+        string              $content,
+        string              $author,
+        ?\DateTimeImmutable $createdAt = null,
+        ?\DateTimeImmutable $updatedAt = null,
+        ?\DateTimeImmutable $deletedAt = null
     )
     {
         $this->id = $id;
@@ -68,6 +80,9 @@ class DoctrineArticleEntity
         $this->subheading = $subheading;
         $this->content = $content;
         $this->author = $author;
+        $this->createdAt = $createdAt ?? new \DateTimeImmutable();
+        $this->updatedAt = $updatedAt ?? new \DateTimeImmutable();
+        $this->deletedAt = $deletedAt;
     }
 
     public static function fromDomain(ArticleEntity $article): self
@@ -126,6 +141,31 @@ class DoctrineArticleEntity
         $this->author = $author;
     }
 
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): void
+    {
+        $this->deletedAt = $deletedAt;
+    }
+
     public function toDomain(): ArticleEntity
     {
         return new ArticleEntity(
@@ -133,7 +173,10 @@ class DoctrineArticleEntity
             $this->heading,
             $this->subheading,
             $this->content,
-            $this->author
+            $this->author,
+            $this->createdAt,
+            $this->updatedAt,
+            $this->deletedAt
         );
     }
 }

@@ -17,17 +17,23 @@ final readonly class CreateArticleUseCase
 
     public function execute(CreateArticleCommand $command): ArticleEntity
     {
-        try {
+        try
+        {
+            $createdAt = $command->getCreatedAt();
+
             $article = new ArticleEntity(
                 $command->getId(),
                 $command->getHeading(),
                 $command->getSubheading(),
                 $command->getContent(),
                 $command->getAuthor(),
+                $createdAt,
+                $createdAt,
             );
 
             return $this->articleRepository->create($article);
-        } catch (\Throwable $exception) {
+        } catch(\Throwable $exception)
+        {
             throw new ArticleDomainException($exception->getMessage());
         }
     }

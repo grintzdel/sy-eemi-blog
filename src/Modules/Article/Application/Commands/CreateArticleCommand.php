@@ -9,11 +9,12 @@ use App\Modules\Article\Domain\ValueObjects\ArticleId;
 final readonly class CreateArticleCommand
 {
     public function __construct(
-        private ArticleId $id,
-        private string    $heading,
-        private string    $subheading,
-        private string    $content,
-        private string    $author,
+        private ArticleId           $id,
+        private string              $heading,
+        private string              $subheading,
+        private string              $content,
+        private string              $author,
+        private ?\DateTimeImmutable $createdAt = null,
     ) {}
 
     public function getId(): ArticleId
@@ -39,5 +40,10 @@ final readonly class CreateArticleCommand
     public function getAuthor(): string
     {
         return $this->author;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt ?? new \DateTimeImmutable();
     }
 }

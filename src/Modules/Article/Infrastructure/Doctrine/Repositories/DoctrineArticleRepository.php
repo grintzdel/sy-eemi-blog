@@ -49,6 +49,7 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
         $doctrineArticle->setSubheading($article->getSubheading());
         $doctrineArticle->setContent($article->getContent());
         $doctrineArticle->setAuthor($article->getAuthor());
+        $doctrineArticle->setUpdatedAt(new \DateTimeImmutable());
 
         $this->entityManager->flush();
 
@@ -59,11 +60,12 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
     {
         $doctrineArticle = $this->repository->find($id->getValue());
 
-        if ($doctrineArticle === null) {
+        if($doctrineArticle === null)
+        {
             throw ArticleNotFoundException::withId($id->getValue());
         }
 
-        $this->entityManager->remove($doctrineArticle);
+        $doctrineArticle->setDeletedAt(new \DateTimeImmutable());
         $this->entityManager->flush();
     }
 
