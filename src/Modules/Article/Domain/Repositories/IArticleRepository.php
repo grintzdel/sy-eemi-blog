@@ -18,4 +18,6 @@ interface IArticleRepository
      * Queries
      */
     public function findById(ArticleId $id): ArticleEntity;
+
+    public function findAll(): array;
 }

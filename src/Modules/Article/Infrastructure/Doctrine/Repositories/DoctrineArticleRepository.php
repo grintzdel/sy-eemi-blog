@@ -17,6 +17,9 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
         private EntityManagerInterface $entityManager
     ) {}
 
+    /*
+     * Commands
+     */
     public function create(ArticleEntity $article): ArticleEntity
     {
         $doctrineArticle = DoctrineArticleEntity::fromDomain($article);
@@ -27,16 +30,29 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
         return $doctrineArticle->toDomain();
     }
 
+    /*
+     * Queries
+     */
     public function findById(ArticleId $id): ArticleEntity
     {
         $repository = $this->entityManager->getRepository(DoctrineArticleEntity::class);
         $doctrineArticle = $repository->find($id->getValue());
 
-        if($doctrineArticle === null)
-        {
+        if ($doctrineArticle === null) {
             throw ArticleNotFoundException::withId($id->getValue());
         }
 
         return $doctrineArticle->toDomain();
+    }
+
+    public function findAll(): array
+    {
+        $repository = $this->entityManager->getRepository(DoctrineArticleEntity::class);
+        $doctrineArticles = $repository->findAll();
+
+        return array_map(
+            fn(DoctrineArticleEntity $doctrineArticle) => $doctrineArticle->toDomain(),
+            $doctrineArticles
+        );
     }
 }
