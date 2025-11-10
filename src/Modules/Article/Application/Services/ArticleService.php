@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Article\Application\Services;
 
+use App\Modules\Article\Application\Commands\UpdateArticleCommand;
 use App\Modules\Article\Application\UseCases\Commands\CreateArticleUseCase;
+use App\Modules\Article\Application\UseCases\Commands\UpdateArticleUseCase;
 use App\Modules\Article\Application\UseCases\Queries\FindAllArticlesUseCase;
 use App\Modules\Article\Application\UseCases\Queries\FindArticleByIdUseCase;
 use App\Modules\Article\Domain\Entities\ArticleEntity;
@@ -15,6 +17,7 @@ final readonly class ArticleService
         private CreateArticleUseCase   $createArticleUseCase,
         private FindArticleByIdUseCase $findArticleByIdUseCase,
         private FindAllArticlesUseCase $findAllArticlesUseCase,
+        private UpdateArticleUseCase   $updateArticleUseCase,
     ) {}
 
     /*
@@ -23,6 +26,11 @@ final readonly class ArticleService
     public function create(ArticleEntity $article): ArticleEntity
     {
         return $this->createArticleUseCase->execute($article);
+    }
+
+    public function update(UpdateArticleCommand $article): ArticleEntity
+    {
+        return $this->updateArticleUseCase->execute($article);
     }
 
     /*

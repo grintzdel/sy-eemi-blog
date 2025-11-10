@@ -40,4 +40,19 @@ final readonly class ArticleEntity
     {
         return $this->author;
     }
+
+    public function withUpdates(
+        ?string $heading = null,
+        ?string $subheading = null,
+        ?string $content = null,
+        ?string $author = null,
+    ): self {
+        return new self(
+            $this->id,
+            $heading ?? $this->heading,
+            $subheading ?? $this->subheading,
+            $content ?? $this->content,
+            $author ?? $this->author,
+        );
+    }
 }

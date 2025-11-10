@@ -36,6 +36,25 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
         return $doctrineArticle->toDomain();
     }
 
+    public function update(ArticleEntity $article): ArticleEntity
+    {
+        $doctrineArticle = $this->repository->find($article->getId()->getValue());
+
+        if($doctrineArticle === null)
+        {
+            throw ArticleNotFoundException::withId($article->getId()->getValue());
+        }
+
+        $doctrineArticle->setHeading($article->getHeading());
+        $doctrineArticle->setSubheading($article->getSubheading());
+        $doctrineArticle->setContent($article->getContent());
+        $doctrineArticle->setAuthor($article->getAuthor());
+
+        $this->entityManager->flush();
+
+        return $doctrineArticle->toDomain();
+    }
+
     /*
      * Queries
      */

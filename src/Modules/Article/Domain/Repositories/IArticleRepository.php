@@ -14,6 +14,8 @@ interface IArticleRepository
      */
     public function create(ArticleEntity $article): ArticleEntity;
 
+    public function update(ArticleEntity $article): ArticleEntity;
+    
     /*
      * Queries
      */

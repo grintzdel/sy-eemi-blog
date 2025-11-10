@@ -64,9 +64,19 @@ class DoctrineArticleEntity
         return $this->heading;
     }
 
+    public function setHeading(string $heading): void
+    {
+        $this->heading = $heading;
+    }
+
     public function getSubheading(): string
     {
         return $this->subheading;
+    }
+
+    public function setSubheading(string $subheading): void
+    {
+        $this->subheading = $subheading;
     }
 
     public function getContent(): string
@@ -74,9 +84,19 @@ class DoctrineArticleEntity
         return $this->content;
     }
 
+    public function setContent(string $content): void
+    {
+        $this->content = $content;
+    }
+
     public function getAuthor(): string
     {
         return $this->author;
+    }
+
+    public function setAuthor(string $author): void
+    {
+        $this->author = $author;
     }
 
     public function toDomain(): ArticleEntity
