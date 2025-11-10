@@ -11,14 +11,14 @@ use App\Modules\Article\Domain\Repositories\IArticleRepository;
 final readonly class CreateArticleUseCase
 {
     public function __construct(
-        private IArticleRepository $repository
+        private IArticleRepository $articleRepository
     ) {}
 
     public function execute(ArticleEntity $article): ArticleEntity
     {
         try
         {
-            return $this->repository->create($article);
+            return $this->articleRepository->create($article);
         } catch(\Throwable $exception)
         {
             throw new ArticleDomainException($exception->getMessage());
