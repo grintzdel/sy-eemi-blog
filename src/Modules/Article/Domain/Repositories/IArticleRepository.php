@@ -5,8 +5,17 @@ declare(strict_types=1);
 namespace App\Modules\Article\Domain\Repositories;
 
 use App\Modules\Article\Domain\Entities\ArticleEntity;
+use App\Modules\Article\Domain\ValueObjects\ArticleId;
 
 interface IArticleRepository
 {
+    /*
+     * Commands
+     */
     public function create(ArticleEntity $article): ArticleEntity;
+
+    /*
+     * Queries
+     */
+    public function findById(ArticleId $id): ArticleEntity;
 }
