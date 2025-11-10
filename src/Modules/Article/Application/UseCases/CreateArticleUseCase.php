@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Article\Application\UseCases;
 
 use App\Modules\Article\Domain\Entities\ArticleEntity;
+use App\Modules\Article\Domain\Exceptions\ArticleDomainException;
 use App\Modules\Article\Domain\Repositories\IArticleRepository;
 
 final readonly class CreateArticleUseCase
@@ -15,6 +16,12 @@ final readonly class CreateArticleUseCase
 
     public function execute(ArticleEntity $article): ArticleEntity
     {
-        return $this->repository->create($article);
+        try
+        {
+            return $this->repository->create($article);
+        } catch(\Throwable $exception)
+        {
+            throw new ArticleDomainException($exception->getMessage());
+        }
     }
 }
