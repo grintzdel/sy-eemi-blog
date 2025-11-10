@@ -7,6 +7,7 @@ namespace App\Modules\Article\Infrastructure\Doctrine\Entities;
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'articles')]
@@ -17,15 +18,41 @@ class DoctrineArticleEntity
     private string $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'Heading is required')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Heading must be at least {{ limit }} characters long',
+        maxMessage: 'Heading cannot be longer than {{ limit }} characters'
+    )]
     private string $heading;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'Subheading is required')]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: 'Subheading must be at least {{ limit }} characters long',
+        maxMessage: 'Subheading cannot be longer than {{ limit }} characters'
+    )]
     private string $subheading;
 
     #[ORM\Column(type: 'text')]
+    #[Assert\NotBlank(message: 'Content is required')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'Content must be at least {{ limit }} characters long'
+    )]
     private string $content;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'Author is required')]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: 'Author name must be at least {{ limit }} characters long',
+        maxMessage: 'Author name cannot be longer than {{ limit }} characters'
+    )]
     private string $author;
 
     public function __construct(

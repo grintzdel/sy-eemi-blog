@@ -10,9 +10,8 @@ use App\Modules\Article\Application\Services\ArticleService;
 use App\Modules\Article\Domain\Exceptions\ArticleDomainException;
 use App\Modules\Article\Domain\Exceptions\ArticleNotFoundException;
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
-use App\Modules\Article\Presentation\Dto\CreateArticleDto;
-use App\Modules\Article\Presentation\Dto\UpdateArticleDto;
 use App\Modules\Article\Presentation\Forms\ArticleFormType;
+use App\Modules\Article\Presentation\WriteModel\ArticleModel;
 use App\Modules\Shared\Presentation\Controllers\AppController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,32 +40,25 @@ final class ArticleController extends AppController
     {
         return $this->handleForm(
             request: $request,
-            form: $this->createForm(ArticleFormType::class),
-            onSuccess: function(array $data)
+            form: $this->createForm(ArticleFormType::class, new ArticleModel()),
+            onSuccess: function(ArticleModel $model)
             {
-                $dto = new CreateArticleDto(
-                    heading: $data['heading'],
-                    subheading: $data['subheading'],
-                    content: $data['content'],
-                    author: $data['author'],
-                );
-
                 $command = new CreateArticleCommand(
                     id: ArticleId::fromString(Uuid::v4()->toString()),
-                    heading: $dto->getHeading(),
-                    subheading: $dto->getSubheading(),
-                    content: $dto->getContent(),
-                    author: $dto->getAuthor(),
+                    heading: $model->heading,
+                    subheading: $model->subheading,
+                    content: $model->content,
+                    author: $model->author,
                 );
 
                 $this->articleService->create($command);
 
-                return $this->successRedirect('Article créé avec succès !', 'article_index');
+                return $this->successRedirect('Article created successfully!', 'article_index');
             },
             template: 'article/new.html.twig',
             exceptionHandlers: [
                 ArticleDomainException::class => [
-                    'message' => 'Erreur lors de la création',
+                    'message' => 'Error creating article',
                     'type' => 'error'
                 ]
             ]
@@ -80,42 +72,30 @@ final class ArticleController extends AppController
             operation: function() use ($id, $request)
             {
                 $article = $this->articleService->findById($id);
+                $model = ArticleModel::createFromEntity($article);
 
                 return $this->handleForm(
                     request: $request,
-                    form: $this->createForm(ArticleFormType::class, [
-                        'heading' => $article->getHeading(),
-                        'subheading' => $article->getSubheading(),
-                        'content' => $article->getContent(),
-                        'author' => $article->getAuthor(),
-                    ]),
-                    onSuccess: function(array $data) use ($id)
+                    form: $this->createForm(ArticleFormType::class, $model),
+                    onSuccess: function(ArticleModel $model) use ($id)
                     {
-                        $dto = new UpdateArticleDto(
-                            id: $id,
-                            heading: $data['heading'],
-                            subheading: $data['subheading'],
-                            content: $data['content'],
-                            author: $data['author'],
-                        );
-
                         $command = new UpdateArticleCommand(
-                            id: ArticleId::fromString($dto->getId()),
-                            heading: $dto->getHeading(),
-                            subheading: $dto->getSubheading(),
-                            content: $dto->getContent(),
-                            author: $dto->getAuthor(),
+                            id: ArticleId::fromString($id),
+                            heading: $model->heading,
+                            subheading: $model->subheading,
+                            content: $model->content,
+                            author: $model->author,
                         );
 
                         $this->articleService->update($command);
 
-                        return $this->successRedirect('Article modifié avec succès !', 'article_index');
+                        return $this->successRedirect('Article updated successfully!', 'article_index');
                     },
                     template: 'article/edit.html.twig',
                     templateData: ['article' => $article],
                     exceptionHandlers: [
                         ArticleDomainException::class => [
-                            'message' => 'Erreur lors de la modification',
+                            'message' => 'Error updating article',
                             'type' => 'error'
                         ]
                     ]
@@ -123,7 +103,7 @@ final class ArticleController extends AppController
             },
             exceptionHandlers: [
                 ArticleNotFoundException::class => [
-                    'message' => 'Article non trouvé',
+                    'message' => 'Article not found',
                     'type' => 'error',
                     'redirect' => 'article_index'
                 ]
