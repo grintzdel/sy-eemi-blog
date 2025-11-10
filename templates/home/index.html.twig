@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - EEMI Blog{% endblock %}
+
+{% block body %}
+    <!-- Hero Section -->
+    <div class="bg-primary text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-4 fw-bold">
+                        <i class="bi bi-journal-richtext"></i> Bienvenue sur EEMI Blog
+                    </h1>
+                    <p class="lead mb-4">
+                        Découvrez nos derniers articles et partagez vos connaissances
+                    </p>
+                    <a href="{{ path('article_new') }}" class="btn btn-light btn-lg">
+                        <i class="bi bi-pencil-square"></i> Écrire un article
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles Section -->
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="bi bi-newspaper"></i> Derniers Articles
+            </h2>
+            <a href="{{ path('article_index') }}" class="btn btn-outline-primary">
+                Voir tous les articles <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        {% if articles is empty %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <h3 class="mt-3">Aucun article pour le moment</h3>
+                <p class="text-muted">Soyez le premier à écrire un article !</p>
+                <a href="{{ path('article_new') }}" class="btn btn-primary mt-3">
+                    <i class="bi bi-plus-circle"></i> Créer le premier article
+                </a>
+            </div>
+        {% else %}
+            <div class="row">
+                {% for article in articles|slice(0, 6) %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm hover-shadow">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ article.heading }}</h5>
+                                <h6 class="card-subtitle mb-3 text-muted">{{ article.subheading }}</h6>
+                                <p class="card-text flex-grow-1">
+                                    {{ article.content|length > 120 ? article.content|slice(0, 120) ~ '...' : article.content }}
+                                </p>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="bi bi-person"></i> {{ article.author }}
+                                        </small>
+                                        <a href="{{ path('article_edit', {id: article.id.value}) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Lire plus <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if articles|length > 6 %}
+                <div class="text-center mt-4">
+                    <a href="{{ path('article_index') }}" class="btn btn-primary">
+                        Voir tous les {{ articles|length }} articles
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <style>
+        .hover-shadow {
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .hover-shadow:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+    </style>
+{% endblock %}
