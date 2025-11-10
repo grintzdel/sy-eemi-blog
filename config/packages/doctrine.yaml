@@ -1,0 +1,43 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+
+        # IMPORTANT: You MUST configure your server version,
+        # either here or in the DATABASE_URL env var (see .env file)
+        #server_version: '16'
+
+        profiling_collect_backtrace: '%kernel.debug%'
+    orm:
+        auto_mapping: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        mappings:
+            App\Modules\Article:
+                type: xml
+                dir: '%kernel.project_dir%/config/doctrine/Article'
+                prefix: 'App\Modules\Domain\Model'
+                is_bundle: false
+                #   App\Modules\Comment:
+                #    type: xml
+                #    dir: '%kernel.project_dir%/config/doctrine/Comment'
+                #    prefix: 'App\Modules\Comment\Domain\Model'
+                #    is_bundle: false
+                # App\Modules\User:
+                #     type: xml
+                #    dir: '%kernel.project_dir%/config/doctrine/User'
+                #    prefix: 'App\Modules\User\Domain\Model'
+                #   is_bundle: false
+
+when@test:
+    doctrine:
+        dbal:
+            # "TEST_TOKEN" is typically set by ParaTest
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+
+when@prod:
+    framework:
+        cache:
+            pools:
+                doctrine.result_cache_pool:
+                    adapter: cache.app
+                doctrine.system_cache_pool:
+                    adapter: cache.system
