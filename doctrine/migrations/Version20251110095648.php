@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DoctrineMigrations;
+namespace doctrine\migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\AbstractMigration;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
