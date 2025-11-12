@@ -8,10 +8,8 @@ use App\Modules\Article\Application\Commands\UpdateArticleCommand;
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 use App\Modules\Article\Domain\Exceptions\ArticleDomainException;
 use App\Modules\Article\Domain\Repositories\IArticleRepository;
-use App\Modules\Article\Domain\ValueObjects\AuthorUsername;
 use App\Modules\User\Domain\Exceptions\UserNotFoundException;
 use App\Modules\User\Domain\Repositories\IUserRepository;
-use App\Modules\User\Domain\ValueObjects\Username;
 
 final readonly class UpdateArticleUseCase
 {
@@ -26,25 +24,24 @@ final readonly class UpdateArticleUseCase
         {
             $existingArticle = $this->articleRepository->findById($command->getId());
 
-            $authorUsername = null;
-            if($command->getAuthorUsername() !== null)
+            $authorId = null;
+            if($command->getAuthorId() !== null)
             {
-                $username = new Username($command->getAuthorUsername());
-                $user = $this->userRepository->findByUsername($username);
+                $user = $this->userRepository->findById($command->getAuthorId());
 
                 if($user === null)
                 {
-                    throw new UserNotFoundException("User with username '{$command->getAuthorUsername()}' not found");
+                    throw new UserNotFoundException("User with ID '{$command->getAuthorId()->getValue()}' not found");
                 }
 
-                $authorUsername = AuthorUsername::fromString($command->getAuthorUsername());
+                $authorId = $command->getAuthorId();
             }
 
             $updatedArticle = $existingArticle->withUpdates(
                 heading: $command->getHeading(),
                 subheading: $command->getSubheading(),
                 content: $command->getContent(),
-                authorUsername: $authorUsername,
+                authorId: $authorId,
                 coverImage: $command->getCoverImage(),
             );
 

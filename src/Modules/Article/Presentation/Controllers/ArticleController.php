@@ -10,9 +10,16 @@ use App\Modules\Article\Application\Services\ArticleService;
 use App\Modules\Article\Domain\Exceptions\ArticleDomainException;
 use App\Modules\Article\Domain\Exceptions\ArticleNotFoundException;
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
+use App\Modules\Article\Infrastructure\Doctrine\Repositories\DoctrineArticleRepository;
 use App\Modules\Article\Presentation\Forms\ArticleFormType;
+use App\Modules\Article\Presentation\ViewModels\ArticleViewModel;
 use App\Modules\Article\Presentation\WriteModel\ArticleModel;
+use App\Modules\Comment\Application\Services\CommentService;
+use App\Modules\Comment\Domain\Repositories\ICommentRepository;
+use App\Modules\Comment\Presentation\Forms\CommentFormType;
+use App\Modules\Comment\Presentation\WriteModel\CommentModel;
 use App\Modules\Shared\Presentation\Controllers\AppController;
+use App\Modules\User\Domain\ValueObjects\UserId;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,15 +31,22 @@ use Symfony\Component\Uid\Uuid;
 final class ArticleController extends AppController
 {
     public function __construct(
-        private readonly ArticleService   $articleService,
-        private readonly SluggerInterface $slugger,
-        private readonly string           $uploadDirectory = 'uploads/articles'
+        private readonly ArticleService            $articleService,
+        private readonly DoctrineArticleRepository $articleRepository,
+        private readonly CommentService            $commentService,
+        private readonly ICommentRepository        $commentRepository,
+        private readonly SluggerInterface          $slugger,
+        private readonly string                    $uploadDirectory = 'uploads/articles'
     ) {}
 
     #[Route('/', name: 'article_index', methods: ['GET'])]
     public function index(): Response
     {
-        $articles = $this->articleService->findAll();
+        $doctrineArticles = $this->articleRepository->findAllDoctrineEntities();
+        $articles = array_map(
+            fn($article) => ArticleViewModel::fromDoctrineEntity($article),
+            $doctrineArticles
+        );
 
         return $this->render('article/index.html.twig', [
             'articles' => $articles,
@@ -45,10 +59,23 @@ final class ArticleController extends AppController
         return $this->executeWithExceptionHandling(
             operation: function() use ($id)
             {
-                $article = $this->articleService->findById($id);
+                $doctrineArticle = $this->articleRepository->findDoctrineEntityById($id);
+
+                if($doctrineArticle === null)
+                {
+                    throw ArticleNotFoundException::withId($id);
+                }
+
+                $article = ArticleViewModel::fromDoctrineEntity($doctrineArticle);
+                $articleDomain = $this->articleService->findById($id);
+                $comments = $this->commentRepository->findDoctrineCommentsByArticleId(ArticleId::fromString($id));
+                $commentForm = $this->createForm(CommentFormType::class, new CommentModel());
 
                 return $this->render('article/show.html.twig', [
                     'article' => $article,
+                    'articleDomain' => $articleDomain,
+                    'comments' => $comments,
+                    'commentForm' => $commentForm->createView(),
                 ]);
             },
             exceptionHandlers: [
@@ -77,7 +104,7 @@ final class ArticleController extends AppController
                     heading: $model->heading,
                     subheading: $model->subheading,
                     content: $model->content,
-                    authorUsername: $this->getUser()->getUsername(),
+                    authorId: UserId::fromString($this->getUser()->getId()),
                     coverImage: $coverImageFilename,
                 );
 
@@ -144,7 +171,7 @@ final class ArticleController extends AppController
                             heading: $model->heading,
                             subheading: $model->subheading,
                             content: $model->content,
-                            authorUsername: null,
+                            authorId: null,
                             coverImage: $coverImageFilename ?? $article->getCoverImage(),
                         );
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Article\Application\Commands;
 
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
+use App\Modules\User\Domain\ValueObjects\UserId;
 
 final readonly class CreateArticleCommand
 {
@@ -13,7 +14,7 @@ final readonly class CreateArticleCommand
         private string              $heading,
         private string              $subheading,
         private string              $content,
-        private string              $authorUsername,
+        private UserId              $authorId,
         private ?string             $coverImage = null,
         private ?\DateTimeImmutable $createdAt = null,
     ) {}
@@ -38,9 +39,9 @@ final readonly class CreateArticleCommand
         return $this->content;
     }
 
-    public function getAuthorUsername(): string
+    public function getAuthorId(): UserId
     {
-        return $this->authorUsername;
+        return $this->authorId;
     }
 
     public function getCoverImage(): ?string

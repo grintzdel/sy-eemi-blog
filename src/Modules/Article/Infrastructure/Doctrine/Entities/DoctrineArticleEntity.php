@@ -6,8 +6,11 @@ namespace App\Modules\Article\Infrastructure\Doctrine\Entities;
 
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
-use App\Modules\Article\Domain\ValueObjects\AuthorUsername;
+use App\Modules\Comment\Infrastructure\Doctrine\Entities\DoctrineCommentEntity;
+use App\Modules\User\Domain\ValueObjects\UserId;
 use App\Modules\User\Infrastructure\Doctrine\Entities\DoctrineUserEntity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -64,6 +67,9 @@ class DoctrineArticleEntity
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
+    #[ORM\OneToMany(targetEntity: DoctrineCommentEntity::class, mappedBy: 'article', cascade: ['persist', 'remove'])]
+    private Collection $comments;
+
     public function __construct(
         string              $id,
         string              $heading,
@@ -85,6 +91,7 @@ class DoctrineArticleEntity
         $this->createdAt = $createdAt ?? new \DateTimeImmutable();
         $this->updatedAt = $updatedAt ?? new \DateTimeImmutable();
         $this->deletedAt = $deletedAt;
+        $this->comments = new ArrayCollection();
     }
 
     public static function fromDomain(ArticleEntity $article): self
@@ -179,6 +186,24 @@ class DoctrineArticleEntity
         $this->deletedAt = $deletedAt;
     }
 
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(DoctrineCommentEntity $comment): void
+    {
+        if(!$this->comments->contains($comment))
+        {
+            $this->comments->add($comment);
+        }
+    }
+
+    public function removeComment(DoctrineCommentEntity $comment): void
+    {
+        $this->comments->removeElement($comment);
+    }
+
     public function toDomain(): ArticleEntity
     {
         return new ArticleEntity(
@@ -186,7 +211,7 @@ class DoctrineArticleEntity
             $this->heading,
             $this->subheading,
             $this->content,
-            AuthorUsername::fromString($this->author->getUsername()),
+            UserId::fromString($this->author->getId()),
             $this->coverImage,
             $this->createdAt,
             $this->updatedAt,

@@ -8,10 +8,8 @@ use App\Modules\Article\Application\Commands\CreateArticleCommand;
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 use App\Modules\Article\Domain\Exceptions\ArticleDomainException;
 use App\Modules\Article\Domain\Repositories\IArticleRepository;
-use App\Modules\Article\Domain\ValueObjects\AuthorUsername;
 use App\Modules\User\Domain\Exceptions\UserNotFoundException;
 use App\Modules\User\Domain\Repositories\IUserRepository;
-use App\Modules\User\Domain\ValueObjects\Username;
 
 final readonly class CreateArticleUseCase
 {
@@ -26,22 +24,20 @@ final readonly class CreateArticleUseCase
         {
             $createdAt = $command->getCreatedAt();
 
-            $username = new Username($command->getAuthorUsername());
-            $user = $this->userRepository->findByUsername($username);
+            // Verify user exists
+            $user = $this->userRepository->findById($command->getAuthorId());
 
             if($user === null)
             {
-                throw new UserNotFoundException("User with username '{$command->getAuthorUsername()}' not found");
+                throw new UserNotFoundException("User with ID '{$command->getAuthorId()->getValue()}' not found");
             }
-
-            $authorUsername = AuthorUsername::fromString($command->getAuthorUsername());
 
             $article = new ArticleEntity(
                 $command->getId(),
                 $command->getHeading(),
                 $command->getSubheading(),
                 $command->getContent(),
-                $authorUsername,
+                $command->getAuthorId(),
                 $command->getCoverImage(),
                 $createdAt,
                 $createdAt,

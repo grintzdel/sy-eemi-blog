@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Article\Domain\Entities;
 
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
-use App\Modules\Article\Domain\ValueObjects\AuthorUsername;
+use App\Modules\User\Domain\ValueObjects\UserId;
 
 final readonly class ArticleEntity
 {
@@ -14,7 +14,7 @@ final readonly class ArticleEntity
         private string              $heading,
         private string              $subheading,
         private string              $content,
-        private AuthorUsername      $authorUsername,
+        private UserId              $authorId,
         private ?string             $coverImage,
         private \DateTimeImmutable  $createdAt,
         private \DateTimeImmutable  $updatedAt,
@@ -41,9 +41,9 @@ final readonly class ArticleEntity
         return $this->content;
     }
 
-    public function getAuthorUsername(): AuthorUsername
+    public function getAuthorId(): UserId
     {
-        return $this->authorUsername;
+        return $this->authorId;
     }
 
     public function getCoverImage(): ?string
@@ -67,11 +67,11 @@ final readonly class ArticleEntity
     }
 
     public function withUpdates(
-        ?string         $heading = null,
-        ?string         $subheading = null,
-        ?string         $content = null,
-        ?AuthorUsername $authorUsername = null,
-        ?string         $coverImage = null,
+        ?string  $heading = null,
+        ?string  $subheading = null,
+        ?string  $content = null,
+        ?UserId  $authorId = null,
+        ?string  $coverImage = null,
     ): self
     {
         return new self(
@@ -79,7 +79,7 @@ final readonly class ArticleEntity
             $heading ?? $this->heading,
             $subheading ?? $this->subheading,
             $content ?? $this->content,
-            $authorUsername ?? $this->authorUsername,
+            $authorId ?? $this->authorId,
             $coverImage ?? $this->coverImage,
             $this->createdAt,
             new \DateTimeImmutable(),

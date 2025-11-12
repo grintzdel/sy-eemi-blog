@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Article\Application\Commands;
 
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
+use App\Modules\User\Domain\ValueObjects\UserId;
 
 final readonly class UpdateArticleCommand
 {
@@ -13,7 +14,7 @@ final readonly class UpdateArticleCommand
         private ?string             $heading = null,
         private ?string             $subheading = null,
         private ?string             $content = null,
-        private ?string             $authorUsername = null,
+        private ?UserId             $authorId = null,
         private ?string             $coverImage = null,
         private ?\DateTimeImmutable $updatedAt = null,
     ) {}
@@ -38,9 +39,9 @@ final readonly class UpdateArticleCommand
         return $this->content;
     }
 
-    public function getAuthorUsername(): ?string
+    public function getAuthorId(): ?UserId
     {
-        return $this->authorUsername;
+        return $this->authorId;
     }
 
     public function getCoverImage(): ?string

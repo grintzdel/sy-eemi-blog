@@ -31,15 +31,15 @@
                             {% endif %}
                         </div>
 
-                        {% if is_granted('EDIT', article) or is_granted('DELETE', article) %}
+                        {% if is_granted('EDIT', articleDomain) or is_granted('DELETE', articleDomain) %}
                             <div class="btn-group">
-                                {% if is_granted('EDIT', article) %}
+                                {% if is_granted('EDIT', articleDomain) %}
                                     <a href="{{ path('article_edit', {id: article.id}) }}"
                                        class="btn btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Modifier
                                     </a>
                                 {% endif %}
-                                {% if is_granted('DELETE', article) %}
+                                {% if is_granted('DELETE', articleDomain) %}
                                     <form method="post"
                                           action="{{ path('article_delete', {id: article.id}) }}"
                                           onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');"
@@ -67,6 +67,44 @@
                 <div class="article-content mb-5">
                     <div class="lead" style="white-space: pre-line; line-height: 1.8;">
                         {{ article.content }}
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <h3 class="mb-4">
+                        <i class="bi bi-chat-left-text"></i> Commentaires
+                    </h3>
+
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Ajouter un commentaire</h5>
+                                {{ form_start(commentForm, {'action': path('comment_new', {articleId: article.id}), 'method': 'POST'}) }}
+                                    {{ form_row(commentForm.content) }}
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send"></i> Publier
+                                    </button>
+                                {{ form_end(commentForm) }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            Vous devez être <a href="{{ path('app_login') }}">connecté</a> pour commenter.
+                        </div>
+                    {% endif %}
+
+                    <div class="comments-list">
+                        {% if comments is defined and comments|length > 0 %}
+                            {% for comment in comments %}
+                                {% include 'comment/_comment.html.twig' with {'comment': comment} %}
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-light text-center">
+                                <i class="bi bi-chat"></i>
+                                Aucun commentaire pour le moment. Soyez le premier à commenter !
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
 

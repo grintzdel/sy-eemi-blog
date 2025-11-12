@@ -31,11 +31,11 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
     public function create(ArticleEntity $article): ArticleEntity
     {
         $author = $this->entityManager->getRepository(DoctrineUserEntity::class)
-            ->findOneBy(['username' => $article->getAuthorUsername()->getValue()]);
+            ->find($article->getAuthorId()->getValue());
 
         if($author === null)
         {
-            throw UserNotFoundException::withId($article->getAuthorUsername()->getValue());
+            throw UserNotFoundException::withId($article->getAuthorId()->getValue());
         }
 
         $doctrineArticle = new DoctrineArticleEntity(
@@ -63,11 +63,11 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
         }
 
         $author = $this->entityManager->getRepository(DoctrineUserEntity::class)
-            ->findOneBy(['username' => $article->getAuthorUsername()->getValue()]);
+            ->find($article->getAuthorId()->getValue());
 
         if($author === null)
         {
-            throw UserNotFoundException::withId($article->getAuthorUsername()->getValue());
+            throw UserNotFoundException::withId($article->getAuthorId()->getValue());
         }
 
         $doctrineArticle->setHeading($article->getHeading());
@@ -100,10 +100,14 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
      */
     public function findById(ArticleId $id): ArticleEntity
     {
-        $doctrineArticle = $this->repository->findOneBy([
-            'id' => $id->getValue(),
-            'deletedAt' => null
-        ]);
+        $qb = $this->repository->createQueryBuilder('a');
+        $qb->join('a.author', 'u')
+            ->addSelect('u')
+            ->where('a.id = :id')
+            ->andWhere('a.deletedAt IS NULL')
+            ->setParameter('id', $id->getValue());
+
+        $doctrineArticle = $qb->getQuery()->getOneOrNullResult();
 
         if($doctrineArticle === null)
         {
@@ -115,11 +119,43 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
 
     public function findAll(): array
     {
-        $doctrineArticles = $this->repository->findBy(['deletedAt' => null]);
+        $qb = $this->repository->createQueryBuilder('a');
+        $qb->join('a.author', 'u')
+            ->addSelect('u')
+            ->where('a.deletedAt IS NULL')
+            ->orderBy('a.createdAt', 'DESC');
+
+        $doctrineArticles = $qb->getQuery()->getResult();
 
         return array_map(
             fn(DoctrineArticleEntity $doctrineArticle) => $doctrineArticle->toDomain(),
             $doctrineArticles
         );
+    }
+
+    /*
+     * Presentation queries - return Doctrine entities with relations for ViewModels
+     */
+    public function findAllDoctrineEntities(): array
+    {
+        $qb = $this->repository->createQueryBuilder('a');
+        $qb->join('a.author', 'u')
+            ->addSelect('u')
+            ->where('a.deletedAt IS NULL')
+            ->orderBy('a.createdAt', 'DESC');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findDoctrineEntityById(string $id): ?DoctrineArticleEntity
+    {
+        $qb = $this->repository->createQueryBuilder('a');
+        $qb->join('a.author', 'u')
+            ->addSelect('u')
+            ->where('a.id = :id')
+            ->andWhere('a.deletedAt IS NULL')
+            ->setParameter('id', $id);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }
