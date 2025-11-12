@@ -21,11 +21,11 @@ doctrine:
             #     dir: '%kernel.project_dir%/src/Modules/Comment/Infrastructure/Doctrine/Entities'
             #     prefix: 'App\Modules\Comment\Infrastructure\Doctrine\Entities'
             #     is_bundle: false
-            # User:
-            #     type: attribute
-            #     dir: '%kernel.project_dir%/src/Modules/User/Infrastructure/Doctrine/Entities'
-            #     prefix: 'App\Modules\User\Infrastructure\Doctrine\Entities'
-            #     is_bundle: false
+            User:
+                type: attribute
+                dir: '%kernel.project_dir%/src/Modules/User/Infrastructure/Doctrine/Entities'
+                prefix: 'App\Modules\User\Infrastructure\Doctrine\Entities'
+                is_bundle: false
 
 when@test:
     doctrine:
