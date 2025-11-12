@@ -16,17 +16,23 @@ final class ArticleFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $isEdit = $options['is_edit'] ?? false;
+
         $builder
             ->add('heading', TextType::class)
             ->add('subheading', TextType::class)
             ->add('content', TextareaType::class)
-            ->add('coverImage', FileType::class);
+            ->add('coverImage', FileType::class, [
+                'required' => !$isEdit,
+                'label' => $isEdit ? 'Cover Image (optional - leave empty to keep current)' : 'Cover Image',
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => ArticleModel::class,
+            'is_edit' => false,
         ]);
     }
 }
