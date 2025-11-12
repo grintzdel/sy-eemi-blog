@@ -7,6 +7,7 @@ namespace App\Modules\User\Domain\Repositories;
 use App\Modules\User\Domain\Entities\UserEntity;
 use App\Modules\User\Domain\ValueObjects\Email;
 use App\Modules\User\Domain\ValueObjects\UserId;
+use App\Modules\User\Domain\ValueObjects\Username;
 
 interface IUserRepository
 {
@@ -21,4 +22,6 @@ interface IUserRepository
     public function findById(UserId $id): UserEntity;
 
     public function findByEmail(Email $email): ?UserEntity;
+
+    public function findByUsername(Username $username): ?UserEntity;
 }

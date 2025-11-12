@@ -9,6 +9,7 @@ use App\Modules\User\Domain\Exceptions\UserNotFoundException;
 use App\Modules\User\Domain\Repositories\IUserRepository;
 use App\Modules\User\Domain\ValueObjects\Email;
 use App\Modules\User\Domain\ValueObjects\UserId;
+use App\Modules\User\Domain\ValueObjects\Username;
 use App\Modules\User\Infrastructure\Doctrine\Entities\DoctrineUserEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -57,7 +58,12 @@ final readonly class DoctrineUserRepository implements IUserRepository
         $doctrineUser = $this->repository->findOneBy(['email' => $email->value]);
 
         return $doctrineUser?->toDomain();
-
     }
 
+    public function findByUsername(Username $username): ?UserEntity
+    {
+        $doctrineUser = $this->repository->findOneBy(['username' => $username->value]);
+
+        return $doctrineUser?->toDomain();
+    }
 }
