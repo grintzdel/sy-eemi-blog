@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Article\Infrastructure\Security;
 
 use App\Modules\Article\Domain\Entities\ArticleEntity;
+use App\Modules\Shared\Domain\Enums\Roles;
 use App\Modules\User\Infrastructure\Doctrine\Entities\DoctrineUserEntity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -33,7 +34,7 @@ final class ArticleVoter extends Voter
 
         $isAuthor = (string)$article->getAuthorUsername() === $user->getUsername();
 
-        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles());
+        $isAdmin = $user->getRole() === Roles::ROLE_ADMIN;
 
         return match ($attribute)
         {

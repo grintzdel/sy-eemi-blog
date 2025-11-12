@@ -44,7 +44,7 @@ final class DoctrineUserEntity implements UserInterface, PasswordAuthenticatedUs
         string $email = '',
         int    $age = 0,
         string $password = '',
-        Roles  $role = Roles::USER
+        Roles  $role = Roles::ROLE_USER
     )
     {
         $this->id = $id;
@@ -139,12 +139,9 @@ final class DoctrineUserEntity implements UserInterface, PasswordAuthenticatedUs
         );
     }
 
-    /*
-     * getRoles method from Symfony security
-     */
     public function getRoles(): array
     {
-        return ['ROLE_' . $this->role->value];
+        return [$this->role->value];
     }
 
     public function eraseCredentials(): void {}

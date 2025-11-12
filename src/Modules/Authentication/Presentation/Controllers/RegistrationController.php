@@ -40,7 +40,7 @@ final class RegistrationController extends AppController
                     new Email($data->email),
                     $data->birthdate,
                     $data->plainPassword,
-                    Roles::USER
+                    Roles::ROLE_USER
                 );
 
                 $this->authenticationService->registerUser($command);

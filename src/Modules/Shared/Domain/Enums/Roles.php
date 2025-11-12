@@ -6,9 +6,9 @@ namespace App\Modules\Shared\Domain\Enums;
 
 enum Roles: string
 {
-    case ADMIN = 'ADMIN';
+    case ROLE_ADMIN = 'ROLE_ADMIN';
 
-    case MODERATOR = 'MODERATOR';
+    case ROLE_MODERATOR = 'ROLE_MODERATOR';
 
-    case USER = 'USER';
+    case ROLE_USER = 'ROLE_USER';
 }
