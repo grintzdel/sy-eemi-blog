@@ -49,6 +49,7 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
         $doctrineArticle->setSubheading($article->getSubheading());
         $doctrineArticle->setContent($article->getContent());
         $doctrineArticle->setAuthor($article->getAuthor());
+        $doctrineArticle->setCoverImage($article->getCoverImage());
         $doctrineArticle->setUpdatedAt(new \DateTimeImmutable());
 
         $this->entityManager->flush();
