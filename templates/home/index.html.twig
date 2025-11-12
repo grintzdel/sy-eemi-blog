@@ -46,26 +46,7 @@
             <div class="row">
                 {% for article in articles|slice(0, 6) %}
                     <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card h-100 shadow-sm hover-shadow">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">{{ article.heading }}</h5>
-                                <h6 class="card-subtitle mb-3 text-muted">{{ article.subheading }}</h6>
-                                <p class="card-text flex-grow-1">
-                                    {{ article.content|length > 120 ? article.content|slice(0, 120) ~ '...' : article.content }}
-                                </p>
-                                <div class="mt-auto">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            <i class="bi bi-person"></i> {{ article.author }}
-                                        </small>
-                                        <a href="{{ path('article_edit', {id: article.id.value}) }}"
-                                           class="btn btn-sm btn-outline-primary">
-                                            Lire plus <i class="bi bi-arrow-right"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {% include 'article/_card.html.twig' with {'article': article, 'showActions': false} %}
                     </div>
                 {% endfor %}
             </div>
@@ -79,14 +60,4 @@
             {% endif %}
         {% endif %}
     </div>
-
-    <style>
-        .hover-shadow {
-            transition: box-shadow 0.3s ease-in-out;
-        }
-
-        .hover-shadow:hover {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-        }
-    </style>
 {% endblock %}

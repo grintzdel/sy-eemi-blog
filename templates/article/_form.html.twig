@@ -1,4 +1,4 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
 <div class="mb-3">
     {{ form_label(form.heading, 'Heading', {
         'label_attr': {'class': 'form-label'}
@@ -50,6 +50,27 @@
         }
     }) }}
     {{ form_errors(form.author) }}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.coverImage, 'Cover Image', {
+        'label_attr': {'class': 'form-label'}
+    }) }}
+    {% if article is defined and article.coverImage %}
+        <div class="mb-2">
+            <img src="{{ asset('uploads/articles/' ~ article.coverImage) }}"
+                 alt="Current cover image"
+                 class="img-thumbnail"
+                 style="max-width: 200px; max-height: 200px; object-fit: cover;">
+            <p class="text-muted small mt-1">Current image</p>
+        </div>
+    {% endif %}
+    {{ form_widget(form.coverImage, {
+        'attr': {
+            'class': 'form-control'
+        }
+    }) }}
+    {{ form_errors(form.coverImage) }}
 </div>
 
 <div class="d-flex justify-content-between">
