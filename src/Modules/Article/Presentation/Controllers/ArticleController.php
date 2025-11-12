@@ -39,6 +39,29 @@ final class ArticleController extends AppController
         ]);
     }
 
+    #[Route('/{id}', name: 'article_show', methods: ['GET'])]
+    public function show(string $id): Response
+    {
+        return $this->executeWithExceptionHandling(
+            operation: function() use ($id)
+            {
+                $article = $this->articleService->findById($id);
+
+                return $this->render('article/show.html.twig', [
+                    'article' => $article,
+                ]);
+            },
+            exceptionHandlers: [
+                ArticleNotFoundException::class => [
+                    'message' => 'Article not found',
+                    'type' => 'error',
+                    'redirect' => 'article_index'
+                ]
+            ],
+            defaultRedirect: 'article_index'
+        );
+    }
+
     #[Route('/new', name: 'article_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {

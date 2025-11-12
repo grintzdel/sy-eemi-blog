@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.heading }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="mb-4">
+                    <a href="{{ path('article_index') }}" class="btn btn-outline-secondary mb-3">
+                        <i class="bi bi-arrow-left"></i> Retour aux articles
+                    </a>
+
+                    <h1 class="display-4 mb-3">{{ article.heading }}</h1>
+                    <h2 class="text-muted mb-4">{{ article.subheading }}</h2>
+
+                    <div class="d-flex justify-content-between align-items-center border-top border-bottom py-3 mb-4">
+                        <div>
+                            <small class="text-muted">
+                                <i class="bi bi-person-circle"></i> Par <strong>{{ article.authorUsername }}</strong>
+                            </small>
+                            <br>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar"></i> Publié le {{ article.createdAt|date('d/m/Y à H:i') }}
+                            </small>
+                            {% if article.updatedAt != article.createdAt %}
+                                <br>
+                                <small class="text-muted">
+                                    <i class="bi bi-pencil"></i> Modifié le {{ article.updatedAt|date('d/m/Y à H:i') }}
+                                </small>
+                            {% endif %}
+                        </div>
+
+                        {% if is_granted('EDIT', article) or is_granted('DELETE', article) %}
+                            <div class="btn-group">
+                                {% if is_granted('EDIT', article) %}
+                                    <a href="{{ path('article_edit', {id: article.id}) }}"
+                                       class="btn btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                {% endif %}
+                                {% if is_granted('DELETE', article) %}
+                                    <form method="post"
+                                          action="{{ path('article_delete', {id: article.id}) }}"
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');"
+                                          class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Cover Image #}
+                {% if article.coverImage %}
+                    <div class="mb-4">
+                        <img src="{{ asset('uploads/articles/' ~ article.coverImage) }}"
+                             class="img-fluid rounded shadow-sm w-100"
+                             alt="{{ article.heading }}"
+                             style="max-height: 500px; object-fit: cover;">
+                    </div>
+                {% endif %}
+
+                <div class="article-content mb-5">
+                    <div class="lead" style="white-space: pre-line; line-height: 1.8;">
+                        {{ article.content }}
+                    </div>
+                </div>
+
+                <div class="text-center mt-5 mb-4">
+                    <a href="{{ path('article_index') }}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> Retour à la liste des articles
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .article-content {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .display-4 {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        h2.text-muted {
+            font-weight: 400;
+        }
+    </style>
+{% endblock %}
