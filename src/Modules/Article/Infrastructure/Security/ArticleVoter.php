@@ -7,18 +7,16 @@ namespace App\Modules\Article\Infrastructure\Security;
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 use App\Modules\Article\Presentation\ViewModels\ArticleViewModel;
 use App\Modules\Shared\Domain\Enums\Roles;
+use App\Modules\Shared\Domain\Enums\VoterActions;
 use App\Modules\User\Infrastructure\Doctrine\Entities\DoctrineUserEntity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 final class ArticleVoter extends Voter
 {
-    public const string EDIT = 'EDIT';
-    public const string DELETE = 'DELETE';
-
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::EDIT, self::DELETE])
+        return in_array($attribute, [VoterActions::EDIT->value, VoterActions::DELETE->value], true)
             && ($subject instanceof ArticleEntity || $subject instanceof ArticleViewModel);
     }
 
@@ -45,7 +43,7 @@ final class ArticleVoter extends Voter
 
         return match ($attribute)
         {
-            self::EDIT, self::DELETE => $isAuthor || $isAdmin,
+            VoterActions::EDIT->value, VoterActions::DELETE->value => $isAuthor || $isAdmin,
             default => false,
         };
     }

@@ -6,18 +6,16 @@ namespace App\Modules\Comment\Infrastructure\Security;
 
 use App\Modules\Comment\Domain\Entities\CommentEntity;
 use App\Modules\Shared\Domain\Enums\Roles;
+use App\Modules\Shared\Domain\Enums\VoterActions;
 use App\Modules\User\Infrastructure\Doctrine\Entities\DoctrineUserEntity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 final class CommentVoter extends Voter
 {
-    public const string EDIT = 'EDIT';
-    public const string DELETE = 'DELETE';
-
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::EDIT, self::DELETE])
+        return in_array($attribute, [VoterActions::EDIT->value, VoterActions::DELETE->value], true)
             && $subject instanceof CommentEntity;
     }
 
@@ -40,7 +38,7 @@ final class CommentVoter extends Voter
 
         return match ($attribute)
         {
-            self::EDIT, self::DELETE => $isAuthor || $isAdmin || $isModerator,
+            VoterActions::EDIT->value, VoterActions::DELETE->value => $isAuthor || $isAdmin || $isModerator,
             default => false,
         };
     }
