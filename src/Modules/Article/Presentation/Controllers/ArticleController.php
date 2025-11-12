@@ -118,7 +118,7 @@ final class ArticleController extends AppController
                             heading: $model->heading,
                             subheading: $model->subheading,
                             content: $model->content,
-                            authorUsername: null, // L'auteur ne change pas lors de la mise à jour
+                            authorUsername: null,
                             coverImage: $coverImageFilename ?? $article->getCoverImage(),
                         );
 
