@@ -8,6 +8,7 @@ use App\Modules\Article\Application\Services\ArticleService;
 use App\Modules\Article\Domain\Exceptions\ArticleNotFoundException;
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
 use App\Modules\Comment\Application\Commands\CreateCommentCommand;
+use App\Modules\Comment\Application\Commands\UpdateCommentCommand;
 use App\Modules\Comment\Application\Services\CommentService;
 use App\Modules\Comment\Domain\Exceptions\CommentNotFoundException;
 use App\Modules\Comment\Domain\ValueObjects\CommentId;
@@ -65,6 +66,58 @@ final class CommentController extends AppController
                 ]
             ],
             defaultRedirect: 'article_show'
+        );
+    }
+
+    #[Route('/{id}/edit', name: 'comment_edit', methods: ['POST'])]
+    public function edit(Request $request, string $id): Response
+    {
+        return $this->executeWithExceptionHandling(
+            operation: function() use ($request, $id)
+            {
+                $comment = $this->commentService->findById($id);
+
+                $this->denyAccessUnlessGranted('EDIT', $comment);
+
+                $form = $this->createForm(CommentFormType::class, new CommentModel());
+                $form->handleRequest($request);
+
+                if($form->isSubmitted())
+                {
+                    if($form->isValid())
+                    {
+                        $model = $form->getData();
+
+                        $command = new UpdateCommentCommand(
+                            id: CommentId::fromString($id),
+                            content: $model->content,
+                        );
+
+                        $this->commentService->update($command);
+
+                        $articleId = $comment->getArticleId()->getValue();
+
+                        return $this->successRedirect('Commentaire modifié avec succès !', 'article_show', ['id' => $articleId]);
+                    } else
+                    {
+                        $articleId = $comment->getArticleId()->getValue();
+                        $this->addFlash('error', 'Erreur de validation du formulaire');
+                        return $this->redirectToRoute('article_show', ['id' => $articleId]);
+                    }
+                }
+
+                $articleId = $comment->getArticleId()->getValue();
+                $this->addFlash('error', 'Formulaire non soumis');
+                return $this->redirectToRoute('article_show', ['id' => $articleId]);
+            },
+            exceptionHandlers: [
+                CommentNotFoundException::class => [
+                    'message' => 'Comment not found',
+                    'type' => 'error',
+                    'redirect' => 'article_index'
+                ]
+            ],
+            defaultRedirect: 'article_index'
         );
     }
 

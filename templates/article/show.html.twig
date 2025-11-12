@@ -80,10 +80,10 @@
                             <div class="card-body">
                                 <h5 class="card-title">Ajouter un commentaire</h5>
                                 {{ form_start(commentForm, {'action': path('comment_new', {articleId: article.id}), 'method': 'POST'}) }}
-                                    {{ form_row(commentForm.content) }}
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-send"></i> Publier
-                                    </button>
+                                {{ form_row(commentForm.content) }}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Publier
+                                </button>
                                 {{ form_end(commentForm) }}
                             </div>
                         </div>
@@ -132,4 +132,19 @@
             font-weight: 400;
         }
     </style>
+
+    <script>
+        function toggleEditForm(commentId) {
+            const contentDiv = document.querySelector('.comment-content-' + commentId);
+            const editForm = document.querySelector('.comment-edit-form-' + commentId);
+
+            if (contentDiv.style.display === 'none') {
+                contentDiv.style.display = 'block';
+                editForm.style.display = 'none';
+            } else {
+                contentDiv.style.display = 'none';
+                editForm.style.display = 'block';
+            }
+        }
+    </script>
 {% endblock %}

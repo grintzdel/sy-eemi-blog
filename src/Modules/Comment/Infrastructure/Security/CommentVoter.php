@@ -12,11 +12,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 final class CommentVoter extends Voter
 {
+    public const string EDIT = 'EDIT';
     public const string DELETE = 'DELETE';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $attribute === self::DELETE
+        return in_array($attribute, [self::EDIT, self::DELETE])
             && $subject instanceof CommentEntity;
     }
 
@@ -39,7 +40,7 @@ final class CommentVoter extends Voter
 
         return match ($attribute)
         {
-            self::DELETE => $isAuthor || $isAdmin || $isModerator,
+            self::EDIT, self::DELETE => $isAuthor || $isAdmin || $isModerator,
             default => false,
         };
     }

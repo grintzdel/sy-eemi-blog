@@ -1,4 +1,4 @@
-<div class="card mb-3">
+<div class="card mb-3" id="comment-{{ comment.getId() }}">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
             <div>
@@ -13,17 +13,56 @@
             </div>
 
             {% set commentEntity = comment.toDomain() %}
-            {% if is_granted('DELETE', commentEntity) %}
-                <form method="post"
-                      action="{{ path('comment_delete', {id: comment.getId()}) }}"
-                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </form>
+            {% if is_granted('EDIT', commentEntity) or is_granted('DELETE', commentEntity) %}
+                <div class="btn-group">
+                    {% if is_granted('EDIT', commentEntity) %}
+                        <button type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                onclick="toggleEditForm('{{ comment.getId() }}')">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    {% endif %}
+                    {% if is_granted('DELETE', commentEntity) %}
+                        <form method="post"
+                              action="{{ path('comment_delete', {id: comment.getId()}) }}"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');"
+                              class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
 
-        <p class="card-text" style="white-space: pre-line;">{{ comment.getContent() }}</p>
+        <div class="comment-content-{{ comment.getId() }}">
+            <p class="card-text" style="white-space: pre-line;">{{ comment.getContent() }}</p>
+        </div>
+
+        {% if is_granted('EDIT', commentEntity) %}
+            <div class="comment-edit-form-{{ comment.getId() }}" style="display: none;">
+                <form method="post" action="{{ path('comment_edit', {id: comment.getId()}) }}"
+                      id="edit-form-{{ comment.getId() }}">
+                    <div class="mb-2">
+                        <textarea name="comment_form[content]"
+                                  class="form-control"
+                                  rows="3"
+                                  required>{{ comment.getContent() }}</textarea>
+                        <input type="hidden" name="comment_form[_token]" value="{{ csrf_token('comment_form') }}">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-check"></i> Sauvegarder
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-secondary"
+                                onclick="toggleEditForm('{{ comment.getId() }}')">
+                            <i class="bi bi-x"></i> Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
     </div>
 </div>
