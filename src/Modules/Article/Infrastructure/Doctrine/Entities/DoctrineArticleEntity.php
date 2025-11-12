@@ -6,6 +6,8 @@ namespace App\Modules\Article\Infrastructure\Doctrine\Entities;
 
 use App\Modules\Article\Domain\Entities\ArticleEntity;
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
+use App\Modules\Article\Domain\ValueObjects\AuthorUsername;
+use App\Modules\User\Infrastructure\Doctrine\Entities\DoctrineUserEntity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -45,15 +47,10 @@ class DoctrineArticleEntity
     )]
     private string $content;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank(message: 'Author is required')]
-    #[Assert\Length(
-        min: 2,
-        max: 255,
-        minMessage: 'Author name must be at least {{ limit }} characters long',
-        maxMessage: 'Author name cannot be longer than {{ limit }} characters'
-    )]
-    private string $author;
+    #[ORM\ManyToOne(targetEntity: DoctrineUserEntity::class)]
+    #[ORM\JoinColumn(name: 'author_id', referencedColumnName: 'id', nullable: false)]
+    #[Assert\NotNull(message: 'Author is required')]
+    private DoctrineUserEntity $author;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $coverImage = null;
@@ -72,7 +69,7 @@ class DoctrineArticleEntity
         string              $heading,
         string              $subheading,
         string              $content,
-        string              $author,
+        DoctrineUserEntity  $author,
         ?string             $coverImage = null,
         ?\DateTimeImmutable $createdAt = null,
         ?\DateTimeImmutable $updatedAt = null,
@@ -137,12 +134,12 @@ class DoctrineArticleEntity
         $this->content = $content;
     }
 
-    public function getAuthor(): string
+    public function getAuthor(): DoctrineUserEntity
     {
         return $this->author;
     }
 
-    public function setAuthor(string $author): void
+    public function setAuthor(DoctrineUserEntity $author): void
     {
         $this->author = $author;
     }
@@ -189,7 +186,7 @@ class DoctrineArticleEntity
             $this->heading,
             $this->subheading,
             $this->content,
-            $this->author,
+            AuthorUsername::fromString($this->author->getUsername()),
             $this->coverImage,
             $this->createdAt,
             $this->updatedAt,
