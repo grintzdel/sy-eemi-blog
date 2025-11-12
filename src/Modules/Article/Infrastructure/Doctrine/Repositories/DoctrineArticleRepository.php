@@ -75,7 +75,10 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
      */
     public function findById(ArticleId $id): ArticleEntity
     {
-        $doctrineArticle = $this->repository->find($id->getValue());
+        $doctrineArticle = $this->repository->findOneBy([
+            'id' => $id->getValue(),
+            'deletedAt' => null
+        ]);
 
         if($doctrineArticle === null)
         {
@@ -87,7 +90,7 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
 
     public function findAll(): array
     {
-        $doctrineArticles = $this->repository->findAll();
+        $doctrineArticles = $this->repository->findBy(['deletedAt' => null]);
 
         return array_map(
             fn(DoctrineArticleEntity $doctrineArticle) => $doctrineArticle->toDomain(),
