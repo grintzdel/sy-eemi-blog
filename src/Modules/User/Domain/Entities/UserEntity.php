@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\User\Domain\Entities;
 
+use App\Modules\Shared\Domain\Enums\Roles;
 use App\Modules\User\Domain\ValueObjects\Age;
 use App\Modules\User\Domain\ValueObjects\Email;
 use App\Modules\User\Domain\ValueObjects\Password;
@@ -18,6 +19,7 @@ final readonly class UserEntity
         private Email    $email,
         private Age      $age,
         private Password $password,
+        private Roles    $role,
     ) {}
 
     public function getId(): UserId
@@ -43,5 +45,10 @@ final readonly class UserEntity
     public function getPassword(): Password
     {
         return $this->password;
+    }
+
+    public function getRole(): Roles
+    {
+        return $this->role;
     }
 }

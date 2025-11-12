@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\User\Infrastructure\Doctrine\Entities;
 
+use App\Modules\Shared\Domain\Enums\Roles;
 use App\Modules\User\Domain\Entities\UserEntity;
 use App\Modules\User\Domain\ValueObjects\Age;
 use App\Modules\User\Domain\ValueObjects\Email;
@@ -34,12 +35,16 @@ final class DoctrineUserEntity implements UserInterface, PasswordAuthenticatedUs
     #[ORM\Column(type: 'string', length: 255)]
     private string $password;
 
+    #[ORM\Column(type: 'string', length: 20, enumType: Roles::class)]
+    private Roles $role;
+
     public function __construct(
         string $id = '',
         string $username = '',
         string $email = '',
         int    $age = 0,
-        string $password = ''
+        string $password = '',
+        Roles  $role = Roles::USER
     )
     {
         $this->id = $id;
@@ -47,6 +52,7 @@ final class DoctrineUserEntity implements UserInterface, PasswordAuthenticatedUs
         $this->email = $email;
         $this->age = $age;
         $this->password = $password;
+        $this->role = $role;
     }
 
     public static function fromDomain(UserEntity $user): self
@@ -56,7 +62,8 @@ final class DoctrineUserEntity implements UserInterface, PasswordAuthenticatedUs
             $user->getUsername()->value,
             $user->getEmail()->value,
             $user->getAge()->value,
-            $user->getPassword()->value
+            $user->getPassword()->value,
+            $user->getRole()
         );
     }
 
@@ -105,6 +112,16 @@ final class DoctrineUserEntity implements UserInterface, PasswordAuthenticatedUs
         $this->password = $password;
     }
 
+    public function getRole(): Roles
+    {
+        return $this->role;
+    }
+
+    public function setRole(Roles $role): void
+    {
+        $this->role = $role;
+    }
+
     public function setPasswordForVerification(string $password): void
     {
         $this->password = $password;
@@ -117,13 +134,17 @@ final class DoctrineUserEntity implements UserInterface, PasswordAuthenticatedUs
             new Username($this->username),
             new Email($this->email),
             Age::from($this->age),
-            Password::fromHashed($this->password)
+            Password::fromHashed($this->password),
+            $this->role
         );
     }
 
+    /*
+     * getRoles method from Symfony security
+     */
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        return ['ROLE_' . $this->role->value];
     }
 
     public function eraseCredentials(): void {}
