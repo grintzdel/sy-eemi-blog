@@ -27,6 +27,7 @@ final readonly class CreateArticleUseCase
                 $command->getSubheading(),
                 $command->getContent(),
                 $command->getAuthor(),
+                $command->getCoverImage(),
                 $createdAt,
                 $createdAt,
             );

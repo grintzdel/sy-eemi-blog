@@ -26,6 +26,7 @@ final readonly class UpdateArticleUseCase
                 subheading: $command->getSubheading(),
                 content: $command->getContent(),
                 author: $command->getAuthor(),
+                coverImage: $command->getCoverImage(),
             );
 
             return $this->articleRepository->update($updatedArticle);

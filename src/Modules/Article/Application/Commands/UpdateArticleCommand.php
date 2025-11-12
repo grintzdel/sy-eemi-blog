@@ -14,6 +14,7 @@ final readonly class UpdateArticleCommand
         private ?string             $subheading = null,
         private ?string             $content = null,
         private ?string             $author = null,
+        private ?string             $coverImage = null,
         private ?\DateTimeImmutable $updatedAt = null,
     ) {}
 
@@ -40,6 +41,11 @@ final readonly class UpdateArticleCommand
     public function getAuthor(): ?string
     {
         return $this->author;
+    }
+
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
     }
 
     public function getUpdatedAt(): \DateTimeImmutable

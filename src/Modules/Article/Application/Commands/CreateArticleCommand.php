@@ -14,6 +14,7 @@ final readonly class CreateArticleCommand
         private string              $subheading,
         private string              $content,
         private string              $author,
+        private ?string             $coverImage = null,
         private ?\DateTimeImmutable $createdAt = null,
     ) {}
 
@@ -40,6 +41,11 @@ final readonly class CreateArticleCommand
     public function getAuthor(): string
     {
         return $this->author;
+    }
+
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
     }
 
     public function getCreatedAt(): \DateTimeImmutable
