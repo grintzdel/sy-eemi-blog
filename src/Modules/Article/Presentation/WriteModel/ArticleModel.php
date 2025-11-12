@@ -43,6 +43,8 @@ final class ArticleModel
             maxMessage: 'Author name cannot be longer than {{ limit }} characters'
         )]
         public ?string $author = null,
+
+        public mixed $coverImage = null,
     ) {}
 
     public static function createFromEntity(ArticleEntity $article): self

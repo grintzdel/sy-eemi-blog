@@ -13,16 +13,20 @@ use App\Modules\Article\Domain\ValueObjects\ArticleId;
 use App\Modules\Article\Presentation\Forms\ArticleFormType;
 use App\Modules\Article\Presentation\WriteModel\ArticleModel;
 use App\Modules\Shared\Presentation\Controllers\AppController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Uid\Uuid;
 
 #[Route('/articles')]
 final class ArticleController extends AppController
 {
     public function __construct(
-        private readonly ArticleService $articleService
+        private readonly ArticleService   $articleService,
+        private readonly SluggerInterface $slugger,
+        private readonly string           $uploadDirectory = 'uploads/articles'
     ) {}
 
     #[Route('/', name: 'article_index', methods: ['GET'])]
@@ -43,12 +47,15 @@ final class ArticleController extends AppController
             form: $this->createForm(ArticleFormType::class, new ArticleModel()),
             onSuccess: function(ArticleModel $model)
             {
+                $coverImageFilename = $this->handleFileUpload($model->coverImage);
+
                 $command = new CreateArticleCommand(
                     id: ArticleId::fromString(Uuid::v4()->toString()),
                     heading: $model->heading,
                     subheading: $model->subheading,
                     content: $model->content,
                     author: $model->author,
+                    coverImage: $coverImageFilename,
                 );
 
                 $this->articleService->create($command);
@@ -65,6 +72,31 @@ final class ArticleController extends AppController
         );
     }
 
+    private function handleFileUpload(?object $file): ?string
+    {
+        if(!$file)
+        {
+            return null;
+        }
+
+        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $this->slugger->slug($originalFilename);
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+
+        try
+        {
+            $file->move(
+                $this->getParameter('kernel.project_dir') . '/public/' . $this->uploadDirectory,
+                $newFilename
+            );
+        } catch(FileException $e)
+        {
+            return null;
+        }
+
+        return $newFilename;
+    }
+
     #[Route('/{id}/edit', name: 'article_edit', methods: ['GET', 'POST'])]
     public function edit(string $id, Request $request): Response
     {
@@ -77,14 +109,17 @@ final class ArticleController extends AppController
                 return $this->handleForm(
                     request: $request,
                     form: $this->createForm(ArticleFormType::class, $model),
-                    onSuccess: function(ArticleModel $model) use ($id)
+                    onSuccess: function(ArticleModel $model) use ($id, $article)
                     {
+                        $coverImageFilename = $this->handleFileUpload($model->coverImage);
+
                         $command = new UpdateArticleCommand(
                             id: ArticleId::fromString($id),
                             heading: $model->heading,
                             subheading: $model->subheading,
                             content: $model->content,
                             author: $model->author,
+                            coverImage: $coverImageFilename ?? $article->getCoverImage(),
                         );
 
                         $this->articleService->update($command);
