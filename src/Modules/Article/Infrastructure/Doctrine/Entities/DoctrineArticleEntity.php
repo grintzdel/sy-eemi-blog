@@ -55,6 +55,9 @@ class DoctrineArticleEntity
     )]
     private string $author;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $coverImage = null;
+
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
@@ -70,6 +73,7 @@ class DoctrineArticleEntity
         string              $subheading,
         string              $content,
         string              $author,
+        ?string             $coverImage = null,
         ?\DateTimeImmutable $createdAt = null,
         ?\DateTimeImmutable $updatedAt = null,
         ?\DateTimeImmutable $deletedAt = null
@@ -80,6 +84,7 @@ class DoctrineArticleEntity
         $this->subheading = $subheading;
         $this->content = $content;
         $this->author = $author;
+        $this->coverImage = $coverImage;
         $this->createdAt = $createdAt ?? new \DateTimeImmutable();
         $this->updatedAt = $updatedAt ?? new \DateTimeImmutable();
         $this->deletedAt = $deletedAt;
@@ -92,7 +97,8 @@ class DoctrineArticleEntity
             $article->getHeading(),
             $article->getSubheading(),
             $article->getContent(),
-            $article->getAuthor()
+            $article->getAuthor(),
+            $article->getCoverImage()
         );
     }
 
@@ -141,6 +147,16 @@ class DoctrineArticleEntity
         $this->author = $author;
     }
 
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
+    }
+
+    public function setCoverImage(?string $coverImage): void
+    {
+        $this->coverImage = $coverImage;
+    }
+
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
@@ -174,6 +190,7 @@ class DoctrineArticleEntity
             $this->subheading,
             $this->content,
             $this->author,
+            $this->coverImage,
             $this->createdAt,
             $this->updatedAt,
             $this->deletedAt

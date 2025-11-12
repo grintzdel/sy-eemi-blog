@@ -14,6 +14,7 @@ final readonly class ArticleEntity
         private string              $subheading,
         private string              $content,
         private string              $author,
+        private ?string             $coverImage,
         private \DateTimeImmutable  $createdAt,
         private \DateTimeImmutable  $updatedAt,
         private ?\DateTimeImmutable $deletedAt = null,
@@ -44,6 +45,11 @@ final readonly class ArticleEntity
         return $this->author;
     }
 
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
+    }
+
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
@@ -64,6 +70,7 @@ final readonly class ArticleEntity
         ?string $subheading = null,
         ?string $content = null,
         ?string $author = null,
+        ?string $coverImage = null,
     ): self
     {
         return new self(
@@ -72,6 +79,7 @@ final readonly class ArticleEntity
             $subheading ?? $this->subheading,
             $content ?? $this->content,
             $author ?? $this->author,
+            $coverImage ?? $this->coverImage,
             $this->createdAt,
             new \DateTimeImmutable(),
             $this->deletedAt,
