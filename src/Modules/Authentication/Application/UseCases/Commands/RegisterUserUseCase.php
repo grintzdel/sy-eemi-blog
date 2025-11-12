@@ -6,6 +6,7 @@ namespace App\Modules\Authentication\Application\UseCases\Commands;
 
 use App\Modules\Authentication\Application\Commands\RegisterUserCommand;
 use App\Modules\Authentication\Domain\Services\IPasswordHasher;
+use App\Modules\Shared\Domain\Enums\Roles;
 use App\Modules\User\Application\Commands\CreateUserCommand;
 use App\Modules\User\Application\UseCases\Commands\CreateUserUseCase;
 use App\Modules\User\Domain\Entities\UserEntity;
@@ -28,7 +29,8 @@ final readonly class RegisterUserUseCase
             $command->getUsername(),
             $command->getEmail(),
             $command->getBirthdate(),
-            $hashedPassword
+            $hashedPassword,
+            $command->getRole()
         );
 
         return $this->createUserUseCase->execute($createUserCommand);

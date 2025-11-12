@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Authentication\Application\Commands;
 
+use App\Modules\Shared\Domain\Enums\Roles;
 use App\Modules\User\Domain\ValueObjects\Email;
 use App\Modules\User\Domain\ValueObjects\UserId;
 use App\Modules\User\Domain\ValueObjects\Username;
@@ -16,6 +17,7 @@ final readonly class RegisterUserCommand
         private Email              $email,
         private \DateTimeImmutable $birthdate,
         private string             $plainPassword,
+        private Roles              $role,
     ) {}
 
     public function getId(): UserId
@@ -41,5 +43,10 @@ final readonly class RegisterUserCommand
     public function getPlainPassword(): string
     {
         return $this->plainPassword;
+    }
+
+    public function getRole(): Roles
+    {
+        return $this->role;
     }
 }

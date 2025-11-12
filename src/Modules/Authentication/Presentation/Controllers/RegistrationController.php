@@ -8,6 +8,7 @@ use App\Modules\Authentication\Application\Commands\RegisterUserCommand;
 use App\Modules\Authentication\Application\Services\AuthenticationService;
 use App\Modules\Authentication\Presentation\Forms\RegistrationFormType;
 use App\Modules\Authentication\Presentation\WriteModel\RegistrationModel;
+use App\Modules\Shared\Domain\Enums\Roles;
 use App\Modules\Shared\Presentation\Controllers\AppController;
 use App\Modules\User\Domain\ValueObjects\Email;
 use App\Modules\User\Domain\ValueObjects\UserId;
@@ -39,6 +40,7 @@ final class RegistrationController extends AppController
                     new Email($data->email),
                     $data->birthdate,
                     $data->plainPassword,
+                    Roles::USER
                 );
 
                 $this->authenticationService->registerUser($command);

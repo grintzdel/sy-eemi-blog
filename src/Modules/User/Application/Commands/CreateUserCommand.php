@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\User\Application\Commands;
 
+use App\Modules\Shared\Domain\Enums\Roles;
 use App\Modules\User\Domain\ValueObjects\Email;
 use App\Modules\User\Domain\ValueObjects\Password;
 use App\Modules\User\Domain\ValueObjects\UserId;
@@ -17,6 +18,7 @@ final readonly class CreateUserCommand
         private Email              $email,
         private \DateTimeImmutable $birthdate,
         private Password           $hashedPassword,
+        private Roles              $role,
     ) {}
 
     public function getId(): UserId
@@ -42,5 +44,10 @@ final readonly class CreateUserCommand
     public function getHashedPassword(): Password
     {
         return $this->hashedPassword;
+    }
+
+    public function getRole(): Roles
+    {
+        return $this->role;
     }
 }
