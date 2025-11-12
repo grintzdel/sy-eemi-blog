@@ -34,7 +34,11 @@ abstract class AppController extends AbstractController
                 }
             } catch(\Throwable $e)
             {
-                return $this->handleException($e, $exceptionHandlers);
+                $response = $this->handleException($e, $exceptionHandlers, $template, $form, $templateData);
+                if($response !== null)
+                {
+                    return $response;
+                }
             }
         }
 
@@ -42,10 +46,12 @@ abstract class AppController extends AbstractController
     }
 
     private function handleException(
-        \Throwable $e,
-        array      $exceptionHandlers = [],
-        ?string    $defaultRedirect = null
-    ): Response
+        \Throwable     $e,
+        array          $exceptionHandlers = [],
+        ?string        $template = null,
+        ?FormInterface $form = null,
+        array          $templateData = []
+    ): ?Response
     {
         foreach($exceptionHandlers as $exceptionClass => $handler)
         {
@@ -60,7 +66,7 @@ abstract class AppController extends AbstractController
                 {
                     $message = $handler['message'] ?? $e->getMessage();
                     $type = $handler['type'] ?? 'error';
-                    $redirect = $handler['redirect'] ?? $defaultRedirect;
+                    $redirect = $handler['redirect'] ?? null;
 
                     $this->addFlash($type, $message);
 
@@ -68,18 +74,15 @@ abstract class AppController extends AbstractController
                     {
                         return $this->redirectToRoute($redirect);
                     }
+
+                    return null;
                 }
             }
         }
 
         $this->addFlash('error', 'Erreur : ' . $e->getMessage());
 
-        if($defaultRedirect)
-        {
-            return $this->redirectToRoute($defaultRedirect);
-        }
-
-        throw $e;
+        return null;
     }
 
     protected function executeWithExceptionHandling(
@@ -105,7 +108,18 @@ abstract class AppController extends AbstractController
             throw new \LogicException('Operation must return a Response or defaultRedirect must be provided');
         } catch(\Throwable $e)
         {
-            return $this->handleException($e, $exceptionHandlers, $defaultRedirect);
+            $response = $this->handleException($e, $exceptionHandlers);
+            if($response !== null)
+            {
+                return $response;
+            }
+
+            if($defaultRedirect)
+            {
+                return $this->redirectToRoute($defaultRedirect);
+            }
+
+            throw $e;
         }
     }
 
