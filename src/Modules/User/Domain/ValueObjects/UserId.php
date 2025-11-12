@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\User\Domain\ValueObjects;
 
+use Symfony\Component\Uid\Uuid;
 use Webmozart\Assert\Assert;
 
 final readonly class UserId implements \Stringable
@@ -19,6 +20,11 @@ final readonly class UserId implements \Stringable
     public static function fromString(string $id): self
     {
         return new self($id);
+    }
+
+    public static function generate(): self
+    {
+        return new self(Uuid::v4()->toRfc4122());
     }
 
     public function getValue(): string

@@ -34,7 +34,8 @@ final readonly class CreateUserUseCase
                 $command->getId(),
                 $command->getUsername(),
                 $command->getEmail(),
-                $age
+                $age,
+                $command->getHashedPassword()
             );
 
             return $this->userRepository->create($user);

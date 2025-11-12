@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\User\Application\Commands;
 
 use App\Modules\User\Domain\ValueObjects\Email;
+use App\Modules\User\Domain\ValueObjects\Password;
 use App\Modules\User\Domain\ValueObjects\UserId;
 use App\Modules\User\Domain\ValueObjects\Username;
 
@@ -15,6 +16,7 @@ final readonly class CreateUserCommand
         private Username           $username,
         private Email              $email,
         private \DateTimeImmutable $birthdate,
+        private Password           $hashedPassword,
     ) {}
 
     public function getId(): UserId
@@ -35,5 +37,10 @@ final readonly class CreateUserCommand
     public function getBirthdate(): \DateTimeImmutable
     {
         return $this->birthdate;
+    }
+
+    public function getHashedPassword(): Password
+    {
+        return $this->hashedPassword;
     }
 }
