@@ -12,7 +12,7 @@ final readonly class Age implements \Stringable
 
     private function __construct(int $value)
     {
-        Assert::greaterThan($value, 0);
+        Assert::greaterThanEq($value, 0, 'Age must be greater than or equal to 0');
 
         $this->value = $value;
     }

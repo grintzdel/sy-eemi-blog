@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Authentication\Presentation\WriteModel;
 
+use App\Modules\Authentication\Presentation\Validators\MinimumAge;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class RegistrationModel
@@ -22,6 +23,7 @@ final class RegistrationModel
     public string $email = '';
 
     #[Assert\NotBlank(message: 'Birthdate is required')]
+    #[MinimumAge]
     public ?\DateTimeImmutable $birthdate = null;
 
     #[Assert\NotBlank(message: 'Password is required')]
