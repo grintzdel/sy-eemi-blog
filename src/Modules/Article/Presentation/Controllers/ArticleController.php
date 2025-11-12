@@ -104,11 +104,14 @@ final class ArticleController extends AppController
             operation: function() use ($id, $request)
             {
                 $article = $this->articleService->findById($id);
+
+                $this->denyAccessUnlessGranted('EDIT', $article);
+
                 $model = ArticleModel::createFromEntity($article);
 
                 return $this->handleForm(
                     request: $request,
-                    form: $this->createForm(ArticleFormType::class, $model),
+                    form: $this->createForm(ArticleFormType::class, $model, ['is_edit' => true]),
                     onSuccess: function(ArticleModel $model) use ($id, $article)
                     {
                         $coverImageFilename = $this->handleFileUpload($model->coverImage);
@@ -153,6 +156,10 @@ final class ArticleController extends AppController
         return $this->executeWithExceptionHandling(
             operation: function() use ($id)
             {
+                $article = $this->articleService->findById($id);
+
+                $this->denyAccessUnlessGranted('DELETE', $article);
+
                 $this->articleService->delete($id);
                 return $this->successRedirect('Article supprimé avec succès !', 'article_index');
             },
