@@ -13,7 +13,7 @@ final readonly class UpdateArticleCommand
         private ?string             $heading = null,
         private ?string             $subheading = null,
         private ?string             $content = null,
-        private ?string             $author = null,
+        private ?string             $authorUsername = null,
         private ?string             $coverImage = null,
         private ?\DateTimeImmutable $updatedAt = null,
     ) {}
@@ -38,9 +38,9 @@ final readonly class UpdateArticleCommand
         return $this->content;
     }
 
-    public function getAuthor(): ?string
+    public function getAuthorUsername(): ?string
     {
-        return $this->author;
+        return $this->authorUsername;
     }
 
     public function getCoverImage(): ?string

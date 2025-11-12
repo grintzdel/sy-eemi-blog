@@ -9,6 +9,8 @@ use App\Modules\Article\Domain\Exceptions\ArticleNotFoundException;
 use App\Modules\Article\Domain\Repositories\IArticleRepository;
 use App\Modules\Article\Domain\ValueObjects\ArticleId;
 use App\Modules\Article\Infrastructure\Doctrine\Entities\DoctrineArticleEntity;
+use App\Modules\User\Domain\Exceptions\UserNotFoundException;
+use App\Modules\User\Infrastructure\Doctrine\Entities\DoctrineUserEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
@@ -28,7 +30,22 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
      */
     public function create(ArticleEntity $article): ArticleEntity
     {
-        $doctrineArticle = DoctrineArticleEntity::fromDomain($article);
+        $author = $this->entityManager->getRepository(DoctrineUserEntity::class)
+            ->findOneBy(['username' => $article->getAuthorUsername()->getValue()]);
+
+        if($author === null)
+        {
+            throw UserNotFoundException::withId($article->getAuthorUsername()->getValue());
+        }
+
+        $doctrineArticle = new DoctrineArticleEntity(
+            $article->getId()->getValue(),
+            $article->getHeading(),
+            $article->getSubheading(),
+            $article->getContent(),
+            $author,
+            $article->getCoverImage()
+        );
 
         $this->entityManager->persist($doctrineArticle);
         $this->entityManager->flush();
@@ -45,10 +62,18 @@ final readonly class DoctrineArticleRepository implements IArticleRepository
             throw ArticleNotFoundException::withId($article->getId()->getValue());
         }
 
+        $author = $this->entityManager->getRepository(DoctrineUserEntity::class)
+            ->findOneBy(['username' => $article->getAuthorUsername()->getValue()]);
+
+        if($author === null)
+        {
+            throw UserNotFoundException::withId($article->getAuthorUsername()->getValue());
+        }
+
         $doctrineArticle->setHeading($article->getHeading());
         $doctrineArticle->setSubheading($article->getSubheading());
         $doctrineArticle->setContent($article->getContent());
-        $doctrineArticle->setAuthor($article->getAuthor());
+        $doctrineArticle->setAuthor($author);
         $doctrineArticle->setCoverImage($article->getCoverImage());
         $doctrineArticle->setUpdatedAt(new \DateTimeImmutable());
 

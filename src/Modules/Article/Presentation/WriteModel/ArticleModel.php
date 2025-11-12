@@ -35,16 +35,7 @@ final class ArticleModel
         )]
         public ?string $content = null,
 
-        #[Assert\NotBlank(message: 'Author is required')]
-        #[Assert\Length(
-            min: 2,
-            max: 255,
-            minMessage: 'Author name must be at least {{ limit }} characters long',
-            maxMessage: 'Author name cannot be longer than {{ limit }} characters'
-        )]
-        public ?string $author = null,
-
-        public mixed $coverImage = null,
+        public mixed   $coverImage = null,
     ) {}
 
     public static function createFromEntity(ArticleEntity $article): self
@@ -53,7 +44,6 @@ final class ArticleModel
             heading: $article->getHeading(),
             subheading: $article->getSubheading(),
             content: $article->getContent(),
-            author: $article->getAuthor(),
         );
     }
 }

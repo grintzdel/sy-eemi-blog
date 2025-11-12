@@ -54,7 +54,7 @@ final class ArticleController extends AppController
                     heading: $model->heading,
                     subheading: $model->subheading,
                     content: $model->content,
-                    author: $model->author,
+                    authorUsername: $this->getUser()->getUsername(),
                     coverImage: $coverImageFilename,
                 );
 
@@ -118,7 +118,7 @@ final class ArticleController extends AppController
                             heading: $model->heading,
                             subheading: $model->subheading,
                             content: $model->content,
-                            author: $model->author,
+                            authorUsername: null, // L'auteur ne change pas lors de la mise à jour
                             coverImage: $coverImageFilename ?? $article->getCoverImage(),
                         );
 

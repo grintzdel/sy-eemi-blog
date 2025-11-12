@@ -11,7 +11,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
 
 final class ArticleFormType extends AbstractType
 {
@@ -21,7 +20,6 @@ final class ArticleFormType extends AbstractType
             ->add('heading', TextType::class)
             ->add('subheading', TextType::class)
             ->add('content', TextareaType::class)
-            ->add('author', TextType::class)
             ->add('coverImage', FileType::class);
     }
 
