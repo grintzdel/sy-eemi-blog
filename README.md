@@ -1,51 +1,204 @@
-# Symfony Docker
+# EEMI Blog 
 
-A [Docker](https://www.docker.com/)-based installer and runtime for the [Symfony](https://symfony.com) web framework,
-with [FrankenPHP](https://frankenphp.dev) and [Caddy](https://caddyserver.com/) inside!
+## Architecture
 
-![CI](https://github.com/dunglas/symfony-docker/workflows/CI/badge.svg)
+### Structure Modulaire
 
-## Getting Started
+Le projet est organisé en modules indépendants suivant une architecture hexagonale (Ports & Adapters) :
 
-1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/) (v2.10+)
-2. Run `docker compose build --pull --no-cache` to build fresh images
-3. Run `docker compose up --wait` to set up and start a fresh Symfony project
-4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
-5. Run `docker compose down --remove-orphans` to stop the Docker containers.
+```
+src/Modules/
+├── Article/        # Gestion des articles
+├── Comment/        # Système de commentaires
+├── User/           # Gestion des utilisateurs
+├── Authentication/ # Login/Logout/Registration
+└── Shared/         # Code partagé (base controllers, enums, fixtures)
+```
 
-## Features
+### Layers (Couches)
 
-- Production, development and CI ready
-- Just 1 service by default
-- Blazing-fast performance thanks to [the worker mode of FrankenPHP](https://frankenphp.dev/docs/worker/)
-- [Installation of extra Docker Compose services](docs/extra-services.md) with Symfony Flex
-- Automatic HTTPS (in dev and prod)
-- HTTP/3 and [Early Hints](https://symfony.com/blog/new-in-symfony-6-3-early-hints) support
-- Real-time messaging thanks to a built-in [Mercure hub](https://symfony.com/doc/current/mercure.html)
-- [Vulcain](https://vulcain.rocks) support
-- Native [XDebug](docs/xdebug.md) integration
-- Super-readable configuration
+Chaque module suit une architecture en 4 couches :
 
-**Enjoy!**
+```
+Module/
+├── Domain/              # Logique métier pure (entities, value objects, interfaces)
+│   ├── Entities/        # Entités métier immuables
+│   ├── ValueObjects/    # Objets valeur avec validation
+│   ├── Repositories/    # Interfaces (ports)
+│   └── Exceptions/      # Exceptions métier
+│
+├── Application/         # Orchestration et cas d'usage
+│   ├── Commands/        # DTOs pour les opérations d'écriture
+│   ├── Services/        # Facades pour simplifier l'accès
+│   └── UseCases/        # Business logic (Commands & Queries)
+│
+├── Infrastructure/      # Implémentations techniques (adapters)
+│   ├── Doctrine/        # ORM et repositories
+│   └── Security/        # Voters pour l'autorisation
+│
+└── Presentation/        # Couche HTTP
+    ├── Controllers/     # Gestion des requêtes HTTP
+    ├── Forms/          # Formulaires Symfony
+    ├── ViewModels/     # Modèles pour la lecture
+    └── WriteModel/     # DTOs pour les formulaires
+```
 
-## Docs
+## Concepts Clés
 
-1. [Options available](docs/options.md)
-2. [Using Symfony Docker with an existing project](docs/existing-project.md)
-3. [Support for extra services](docs/extra-services.md)
-4. [Deploying in production](docs/production.md)
-5. [Debugging with Xdebug](docs/xdebug.md)
-6. [TLS Certificates](docs/tls.md)
-7. [Using MySQL instead of PostgreSQL](docs/mysql.md)
-8. [Using Alpine Linux instead of Debian](docs/alpine.md)
-9. [Using a Makefile](docs/makefile.md)
-10. [Updating the template](docs/updating.md)
-11. [Troubleshooting](docs/troubleshooting.md)
+### 1. Value Objects
 
-## License
+Tous les IDs et données importantes sont encapsulés dans des Value Objects immuables avec validation :
 
-Symfony Docker is available under the MIT License.
+```php
+final readonly class ArticleId implements \Stringable
+{
+    private function __construct(private string $value) {
+        Assert::notEmpty($value);
+        Assert::uuid($value);
+    }
 
-## Credits
+    public static function fromString(string $id): self {
+        return new self($id);
+    }
+}
+```
 
-Created by [Kévin Dunglas](https://dunglas.dev), co-maintained by [Maxime Helias](https://twitter.com/maxhelias) and sponsored by [Les-Tilleuls.coop](https://les-tilleuls.coop).
+### 2. Domain Entities vs Infrastructure Entities
+
+- **Domain Entities** (`ArticleEntity`) : Immuables, logique métier pure
+- **Doctrine Entities** (`DoctrineArticleEntity`) : Mutables, mappées en base de données
+
+Conversion via `toDomain()` et `fromDomain()`.
+
+### 3. CQRS Pattern
+
+Séparation claire entre les opérations :
+- **Commands** : Create, Update, Delete (UseCases/Commands/)
+- **Queries** : Read operations (UseCases/Queries/)
+
+### 4. Repository Pattern
+
+```php
+interface IArticleRepository {
+    public function create(ArticleEntity $article): ArticleEntity;
+    public function findById(ArticleId $id): ArticleEntity;
+}
+
+class DoctrineArticleRepository implements IArticleRepository {
+    // Implementation with Doctrine ORM
+}
+```
+
+### 5. Soft Delete
+
+Toutes les entités utilisent le soft delete via le champ `deletedAt` :
+- Les données ne sont jamais physiquement supprimées
+- Les queries filtrent automatiquement `deletedAt IS NULL`
+
+### 6. Security Voters
+
+Autorisation fine-grained via des Voters :
+
+```php
+class ArticleVoter extends Voter {
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool {
+        // EDIT/DELETE: Author ou Admin uniquement
+        $isAuthor = $article->getAuthorUsername() === $user->getUsername();
+        $isAdmin = $user->getRole() === Roles::ROLE_ADMIN;
+        return $isAuthor || $isAdmin;
+    }
+}
+```
+
+## Fonctionnalités
+
+### Articles
+- CRUD complet avec upload d'images
+- Soft delete
+- Autorisation (edit/delete par auteur ou admin)
+- View models optimisés pour l'affichage
+
+### Commentaires
+- Création sur les articles
+- Édition/suppression par auteur ou admin
+- Soft delete
+- Affichage en temps réel
+
+### Authentification & Autorisation
+- Login/Logout avec Symfony Security
+- Rôles : `ROLE_USER`, `ROLE_MODERATOR`, `ROLE_ADMIN`
+- Access Control pour routes protégées
+- Hash de mots de passe avec Argon2
+
+### Routes Protégées
+```yaml
+access_control:
+    - { path: ^/articles/new, roles: ROLE_USER }
+    - { path: ^/comments/article/.*/new, roles: ROLE_USER }
+```
+
+## Fixtures
+
+Les fixtures génèrent des données de test :
+
+### Utilisateurs (5)
+| Email | Password | Role |
+|-------|----------|------|
+| admin@example.com | admin123 | ROLE_ADMIN |
+| moderator@example.com | moderator123 | ROLE_MODERATOR |
+| john.doe@example.com | user123 | ROLE_USER |
+| jane.doe@example.com | user123 | ROLE_USER |
+| bob.smith@example.com | user123 | ROLE_USER |
+
+### Articles (10)
+- Sujets techniques (Symfony, DDD, Architecture, PHP, Doctrine, etc.)
+- Dates réparties sur les 30 derniers jours
+- Auteurs aléatoires
+
+### Commentaires (20-50)
+- 2-5 commentaires par article
+- Dates après la création de l'article
+- Contenu contextuel basé sur le titre
+
+## Base de Données
+
+### Schema Principal
+
+```sql
+-- Users
+CREATE TABLE users (
+    id VARCHAR(36) PRIMARY KEY,
+    username VARCHAR(20) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    age INT NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL
+);
+
+-- Articles
+CREATE TABLE articles (
+    id VARCHAR(36) PRIMARY KEY,
+    author_id VARCHAR(36) NOT NULL,
+    heading VARCHAR(255) NOT NULL,
+    subheading VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    cover_image VARCHAR(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP,
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+-- Comments
+CREATE TABLE comments (
+    id VARCHAR(36) PRIMARY KEY,
+    article_id VARCHAR(36) NOT NULL,
+    author_id VARCHAR(36) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP,
+    FOREIGN KEY (article_id) REFERENCES articles(id),
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
+```
