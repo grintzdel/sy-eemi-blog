@@ -53,42 +53,6 @@ final class ArticleController extends AppController
         ]);
     }
 
-    #[Route('/{id}', name: 'article_show', methods: ['GET'])]
-    public function show(string $id): Response
-    {
-        return $this->executeWithExceptionHandling(
-            operation: function() use ($id)
-            {
-                $doctrineArticle = $this->articleRepository->findDoctrineEntityById($id);
-
-                if($doctrineArticle === null)
-                {
-                    throw ArticleNotFoundException::withId($id);
-                }
-
-                $article = ArticleViewModel::fromDoctrineEntity($doctrineArticle);
-                $articleDomain = $this->articleService->findById($id);
-                $comments = $this->commentRepository->findDoctrineCommentsByArticleId(ArticleId::fromString($id));
-                $commentForm = $this->createForm(CommentFormType::class, new CommentModel());
-
-                return $this->render('article/show.html.twig', [
-                    'article' => $article,
-                    'articleDomain' => $articleDomain,
-                    'comments' => $comments,
-                    'commentForm' => $commentForm->createView(),
-                ]);
-            },
-            exceptionHandlers: [
-                ArticleNotFoundException::class => [
-                    'message' => 'Article not found',
-                    'type' => 'error',
-                    'redirect' => 'article_index'
-                ]
-            ],
-            defaultRedirect: 'article_index'
-        );
-    }
-
     #[Route('/new', name: 'article_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
@@ -221,6 +185,42 @@ final class ArticleController extends AppController
                 ],
                 ArticleDomainException::class => [
                     'message' => 'Erreur lors de la suppression',
+                    'type' => 'error',
+                    'redirect' => 'article_index'
+                ]
+            ],
+            defaultRedirect: 'article_index'
+        );
+    }
+
+    #[Route('/{id}', name: 'article_show', methods: ['GET'])]
+    public function show(string $id): Response
+    {
+        return $this->executeWithExceptionHandling(
+            operation: function() use ($id)
+            {
+                $doctrineArticle = $this->articleRepository->findDoctrineEntityById($id);
+
+                if($doctrineArticle === null)
+                {
+                    throw ArticleNotFoundException::withId($id);
+                }
+
+                $article = ArticleViewModel::fromDoctrineEntity($doctrineArticle);
+                $articleDomain = $this->articleService->findById($id);
+                $comments = $this->commentRepository->findDoctrineCommentsByArticleId(ArticleId::fromString($id));
+                $commentForm = $this->createForm(CommentFormType::class, new CommentModel());
+
+                return $this->render('article/show.html.twig', [
+                    'article' => $article,
+                    'articleDomain' => $articleDomain,
+                    'comments' => $comments,
+                    'commentForm' => $commentForm->createView(),
+                ]);
+            },
+            exceptionHandlers: [
+                ArticleNotFoundException::class => [
+                    'message' => 'Article not found',
                     'type' => 'error',
                     'redirect' => 'article_index'
                 ]

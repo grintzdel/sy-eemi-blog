@@ -68,6 +68,27 @@
     </div>
 </nav>
 
+<!-- Flash Messages -->
+<div class="container mt-3">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                {% if label == 'success' %}
+                    <i class="bi bi-check-circle-fill"></i>
+                {% elseif label == 'error' or label == 'danger' %}
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                {% elseif label == 'warning' %}
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                {% elseif label == 'info' %}
+                    <i class="bi bi-info-circle-fill"></i>
+                {% endif %}
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+
 <!-- Main Content -->
 {% block body %}{% endblock %}
 
