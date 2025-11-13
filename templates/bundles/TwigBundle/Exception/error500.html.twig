@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur serveur - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row min-vh-100 align-items-center">
+            <div class="col-lg-6 mx-auto text-center">
+                <div class="error-page py-5">
+                    <h1 class="display-1 fw-bold text-danger mb-4">
+                        <i class="bi bi-x-octagon"></i>
+                        500
+                    </h1>
+
+                    <h2 class="mb-4">Erreur interne du serveur</h2>
+                    <p class="lead text-muted mb-5">
+                        Désolé, une erreur inattendue s'est produite sur le serveur.
+                        Nos équipes ont été notifiées et travaillent à résoudre le problème.
+                    </p>
+
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <a href="{{ path('app_home') }}" class="btn btn-danger btn-lg px-4 gap-3">
+                            <i class="bi bi-house-door"></i> Retour à l'accueil
+                        </a>
+                        <button onclick="location.reload()" class="btn btn-outline-secondary btn-lg px-4">
+                            <i class="bi bi-arrow-clockwise"></i> Réessayer
+                        </button>
+                    </div>
+
+                    <div class="mt-5 pt-5">
+                        <div class="alert alert-light border" role="alert">
+                            <i class="bi bi-lightbulb"></i>
+                            <strong>Que pouvez-vous faire ?</strong>
+                            <ul class="text-start mt-3 mb-0">
+                                <li>Actualiser la page dans quelques instants</li>
+                                <li>Vérifier votre connexion internet</li>
+                                <li>Réessayer plus tard</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block stylesheets %}
+        {{ parent() }}
+        <style>
+            .error-page {
+                animation: fadeIn 0.5s ease-in;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .error-page .display-1 {
+                font-size: 8rem;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .error-page i.bi-x-octagon {
+                font-size: 6rem;
+                display: block;
+                margin-bottom: 1rem;
+            }
+
+            .alert ul {
+                padding-left: 1.5rem;
+            }
+
+            .alert ul li {
+                margin-bottom: 0.5rem;
+            }
+        </style>
+    {% endblock %}
+{% endblock %}
